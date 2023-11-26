@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"hotel_api/types"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -33,17 +32,16 @@ func NewMongoUserStore(c *mongo.Client) *MongoUserStore {
 
 func (s *MongoUserStore) GetUsers(ctx context.Context) ([]*types.Users, error) {
 	var users []*types.Users
-	
-	cur, err:= s.coll.Find(ctx,bson.M{})
+
+	cur, err := s.coll.Find(ctx, bson.M{})
 	if err != nil {
 		return nil, err
 	}
-	if err:=cur.All(ctx, &users); err!=nil{
+	if err := cur.All(ctx, &users); err != nil {
 		return nil, err
 	}
 	return users, nil
 }
-
 
 func (s *MongoUserStore) GetUserById(ctx context.Context, id string) (*types.Users, error) {
 	oid, err := primitive.ObjectIDFromHex(id)
