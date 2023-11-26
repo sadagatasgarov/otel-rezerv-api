@@ -47,22 +47,3 @@ func main() {
 func hanlerFunc(c *fiber.Ctx) error {
 	return c.JSON(map[string]string{"msg": "working"})
 }
-
-// coll := client.Database(dbname).Collection(userColl)
-
-// user := types.Users{
-// 	FirstName: "Sada",
-// 	LastName:  "At the water cooler",
-// }
-
-// res, err := coll.InsertOne(context.Background(), user)
-// if err != nil {
-// 	log.Fatal(err)
-// }
-// fmt.Println(res)
-
-// var james types.Users
-// if err:=coll.FindOne(context.Background(), bson.M{}).Decode(&james); err!=nil{
-// 	log.Fatal(err)
-// }
-// fmt.Println(james)

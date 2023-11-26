@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	db "hotel_api/storage"
-	"hotel_api/types"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -18,14 +17,6 @@ func NewUserHandler(userStore db.UserStore) *UserHandler {
 	}
 }
 
-func (h *UserHandler) HandleGetUsers(c *fiber.Ctx) error {
-	u := types.Users{
-		FirstName: "sada",
-		LastName:  "asga",
-	}
-	return c.JSON(u)
-}
-
 func (h UserHandler) HandleGetUser(c *fiber.Ctx) error {
 	var (
 		id  = c.Params("id")
@@ -38,4 +29,13 @@ func (h UserHandler) HandleGetUser(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(user)
+}
+
+func (h *UserHandler) HandleGetUsers(c *fiber.Ctx) error {
+
+	users, err := h.userStore.GetUsers(c.Context())
+	if err != nil {
+		return err
+	}
+	return c.JSON(users)
 }
