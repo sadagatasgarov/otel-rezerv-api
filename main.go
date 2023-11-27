@@ -31,6 +31,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	userHandler := api.NewUserHandler(db.NewMongoUserStore(client))
 
 	app := fiber.New(config)
@@ -39,6 +40,7 @@ func main() {
 	app.Get("/foo", hanlerFunc)
 
 	apiv1.Get("/user", userHandler.HandleGetUsers)
+	apiv1.Post("/user", userHandler.HandleCreateUser)
 	apiv1.Get("/user/:id", userHandler.HandleGetUser)
 
 	app.Listen(*listenAddr)
@@ -47,3 +49,7 @@ func main() {
 func hanlerFunc(c *fiber.Ctx) error {
 	return c.JSON(map[string]string{"msg": "working"})
 }
+
+
+
+//ders22 den baslayacam
