@@ -22,23 +22,23 @@ type CreateUserParams struct {
 	Password  string `json:"password"`
 }
 
-func (params CreateUserParams) Validate() []string {
-	errs := []string{}
+func (params CreateUserParams) Validate() map[string]string {
+	errs := map[string]string{}
 	if len(params.FirstName) < minFirstNameLen {
-		e := fmt.Sprintf("\"firstName\" %d karakteden asagi ola bilmez", minFirstNameLen)
-		errs = append(errs, e)
+		s := fmt.Sprintf("Ad %d karakteden asagi ola bilmez", minFirstNameLen)
+		errs["firstName"]=s
 	}
 	if len(params.LastName) < minLastNameLen {
-		e := fmt.Sprintf("\"lastName\" %d karakteden asagi ola bilmez", minLastNameLen)
-		errs = append(errs, e)
+		s := fmt.Sprintf("Soyad %d karakteden asagi ola bilmez", minLastNameLen)
+		errs["lastName"]=s
 	}
 	if len(params.Password) < minPasswordLen {
-		e := fmt.Sprintf("\"password\" %d karakteden asagi ola bilmez", minPasswordLen)
-		errs = append(errs, e)
+		s := fmt.Sprintf("Parol %d karakteden asagi ola bilmez", minPasswordLen)
+		errs["password"]=s
 	}
 	if !isEmailValid(params.Email) {
-		e := fmt.Sprintf("\"email\" Adresi formata uygun deyil, %s", params.Email)
-		errs = append(errs, e)
+		s := fmt.Sprintf("Email formata uygun deyil, %s", params.Email)
+		errs["email"]=s
 	}
 	if len(errs)>0{
 		return errs
