@@ -43,6 +43,8 @@ func main() {
 	apiv1.Post("/user", userHandler.HandleCreateUser)
 	apiv1.Get("/user/:id", userHandler.HandleGetUser)
 	apiv1.Delete("/user/:id", userHandler.HandleDeleteUser)
+	apiv1.Put("/user/:id", userHandler.HandleUpdateUser)
+
 	app.Listen(*listenAddr)
 }
 
@@ -52,4 +54,4 @@ func hanlerFunc(c *fiber.Ctx) error {
 
 
 
-//ders22 den baslayacam
+//ders23 den baslayacam 13.59

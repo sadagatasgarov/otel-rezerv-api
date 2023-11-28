@@ -22,8 +22,37 @@ func NewUserHandler(userStore db.UserStore) *UserHandler {
 }
 
 func (h UserHandler) HandleUpdateUser(c *fiber.Ctx) error {
-	return nil
+
+	var params types.CreateUserParams
+
+	if err := c.BodyParser(&params); err != nil {
+		return err
+	}
+
+	if err := params.Validate(); err != nil {
+		return c.JSON(err)
+	}
+
+	user, err := types.NewUserFromParams(params)
+	if err != nil {
+		return err
+	}
+
+	userID := c.Params("id")
+	userUpdated, err := h.userStore.UpdateUser(c.Context(), userID, user)
+
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return c.JSON(map[string]string{"msg": "Duzeltmek istediyiniz istifadeci tapilmadi"})
+		}
+		return err
+	}
+
+	msg := map[string]types.Users{}
+	msg["Redakte edildi"] = *userUpdated
+	return c.JSON(msg)
 }
+
 func (h UserHandler) HandleDeleteUser(c *fiber.Ctx) error {
 	userID := c.Params("id")
 	user, err := h.userStore.DeleteUser(c.Context(), userID)
