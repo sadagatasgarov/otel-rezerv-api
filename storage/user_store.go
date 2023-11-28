@@ -17,7 +17,7 @@ type UserStore interface {
 	GetUsers(context.Context) ([]*types.Users, error)
 	InsertUser(context.Context, *types.Users) (*types.Users, error)
 	DeleteUser(context.Context, string) (*types.Users, error)
-	UpdateUser(ctx context.Context, id string, u *types.Users) (*types.Users, error)
+	UpdateUser(ctx context.Context, filter, update bson.M) (error)
 }
 
 type MongoUserStore struct {
@@ -33,25 +33,17 @@ func NewMongoUserStore(c *mongo.Client) *MongoUserStore {
 	}
 }
 
-func (s *MongoUserStore) UpdateUser(ctx context.Context, id string, u *types.Users) (*types.Users, error) {
-	oid, err := primitive.ObjectIDFromHex(id)
+func (s *MongoUserStore) UpdateUser(ctx context.Context, filter, values bson.M) error {
+	update := bson.D{
+		{
+			Key: "$set", Value: values,
+		},
+	}
+	_, err := s.coll.UpdateOne(ctx, filter, update)
 	if err != nil {
-		return nil, err
+		return err
 	}
-
-	filter := bson.D{{Key: "_id", Value: oid}}
-	update := bson.D{{Key: "$set", Value: u}}
-	_, err = s.coll.UpdateOne(ctx, filter, update)
-	if err != nil {
-		return nil, err
-	}
-
-	var user types.Users
-	if err := s.coll.FindOne(ctx, bson.M{"_id": oid}).Decode(&user); err != nil {
-		return nil, err
-	}
-
-	return &user, nil
+	return nil
 }
 
 // func (s *MongoUserStore) UpdateUser(ctx context.Context, id string, u *types.Users) (*types.Users, error) {

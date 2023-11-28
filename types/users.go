@@ -22,25 +22,47 @@ type CreateUserParams struct {
 	Password  string `json:"password"`
 }
 
+type UpdateUserParams struct {
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+}
+
+func (params UpdateUserParams) Validate() map[string]string {
+	errs := map[string]string{}
+	if len(params.FirstName) < minFirstNameLen {
+		s := fmt.Sprintf("Ad %d karakteden asagi ola bilmez", minFirstNameLen)
+		errs["firstName"] = s
+	}
+	if len(params.LastName) < minLastNameLen {
+		s := fmt.Sprintf("Soyad %d karakteden asagi ola bilmez", minLastNameLen)
+		errs["lastName"] = s
+	}
+
+	if len(errs) > 0 {
+		return errs
+	}
+	return nil
+}
+
 func (params CreateUserParams) Validate() map[string]string {
 	errs := map[string]string{}
 	if len(params.FirstName) < minFirstNameLen {
 		s := fmt.Sprintf("Ad %d karakteden asagi ola bilmez", minFirstNameLen)
-		errs["firstName"]=s
+		errs["firstName"] = s
 	}
 	if len(params.LastName) < minLastNameLen {
 		s := fmt.Sprintf("Soyad %d karakteden asagi ola bilmez", minLastNameLen)
-		errs["lastName"]=s
+		errs["lastName"] = s
 	}
 	if len(params.Password) < minPasswordLen {
 		s := fmt.Sprintf("Parol %d karakteden asagi ola bilmez", minPasswordLen)
-		errs["password"]=s
+		errs["password"] = s
 	}
 	if !isEmailValid(params.Email) {
 		s := fmt.Sprintf("Email formata uygun deyil, %s", params.Email)
-		errs["email"]=s
+		errs["email"] = s
 	}
-	if len(errs)>0{
+	if len(errs) > 0 {
 		return errs
 	}
 	return nil
@@ -72,3 +94,5 @@ func NewUserFromParams(params CreateUserParams) (*Users, error) {
 		EncryptedPassword: string(encpw),
 	}, nil
 }
+
+
