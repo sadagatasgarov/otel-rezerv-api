@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"flag"
-	"hotel_api/api"
-	db "hotel_api/storage"
+	"sadagatasgarov/hotel_rezerv_api/api"
+	db "sadagatasgarov/hotel_rezerv_api/storage"
+
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -13,8 +14,9 @@ import (
 )
 
 var uri = "mongodb://root:example@localhost:27017/"
-var dbname = "hotel-rezervation"
-var userColl = "users"
+
+//var dbname = "hotel-rezervation"
+//var userColl = "users"
 
 // Create a new fiber instance with custom config
 var config = fiber.Config{
@@ -51,7 +53,3 @@ func main() {
 func hanlerFunc(c *fiber.Ctx) error {
 	return c.JSON(map[string]string{"msg": "working"})
 }
-
-
-
-//ders23 den baslayacam 13.59

@@ -3,9 +3,8 @@ package api
 import (
 	"context"
 	"errors"
-
-	db "hotel_api/storage"
-	"hotel_api/types"
+	db "sadagatasgarov/hotel_rezerv_api/storage"
+	"sadagatasgarov/hotel_rezerv_api/types"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -34,20 +33,20 @@ func (h UserHandler) HandleUpdateUser(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	
+
 	if err := c.BodyParser(&params); err != nil {
 		return err
 	}
-	filter := bson.M{"_id":oid}
-	
-	if  err := h.userStore.UpdateUser(c.Context(), filter, params); err != nil {
+	filter := bson.M{"_id": oid}
+
+	if err := h.userStore.UpdateUser(c.Context(), filter, params); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return c.JSON(map[string]string{"msg": "Duzeltmek istediyiniz istifadeci tapilmadi"})
 		}
 		return err
 	}
 
-	return c.JSON(map[string]string{"redakte olundu":userID})
+	return c.JSON(map[string]string{"redakte olundu": userID})
 }
 
 func (h UserHandler) HandleDeleteUser(c *fiber.Ctx) error {
