@@ -15,7 +15,7 @@ import (
 
 var uri = "mongodb://root:example@localhost:27017/"
 
-//var dbname = "hotel-rezervation"
+var dbname = "hotel-rezervation"
 //var userColl = "users"
 
 // Create a new fiber instance with custom config
@@ -34,7 +34,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	userHandler := api.NewUserHandler(db.NewMongoUserStore(client))
+	userHandler := api.NewUserHandler(db.NewMongoUserStore(client, dbname))
 
 	app := fiber.New(config)
 	apiv1 := app.Group("api/v1")
