@@ -6,7 +6,6 @@ import (
 	"log"
 
 	"sadagatasgarov/hotel_rezerv_api/api"
-	"sadagatasgarov/hotel_rezerv_api/middleware"
 	db "sadagatasgarov/hotel_rezerv_api/storage"
 
 	"github.com/gofiber/fiber/v2"
@@ -37,13 +36,13 @@ func main() {
 		roomStore  = db.NewMongoRoomStore(client, hotelStore)
 		store      = db.Store{
 			Hotel: hotelStore,
-			User: userStore,
-			Room: roomStore,
+			User:  userStore,
+			Room:  roomStore,
 		}
 		hotelHandler = api.NewHotelHandler(&store)
 
 		app   = fiber.New(config)
-		apiv1 = app.Group("api/v1", middleware.JWTAuthentication)
+		apiv1 = app.Group("api/v1")
 	)
 
 	apiv1.Get("/user", userHandler.HandleGetUsers)
@@ -53,6 +52,7 @@ func main() {
 	apiv1.Put("/user/:id", userHandler.HandleUpdateUser)
 
 	apiv1.Get("/hotel", hotelHandler.HandleGetHotels)
+	apiv1.Get("/hotel/:id", hotelHandler.HandleGetHotel)
 	apiv1.Get("/hotel/:id/rooms", hotelHandler.HandleGetRooms)
 	app.Listen(*listenAddr)
 }
