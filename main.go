@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"flag"
-	"sadagatasgarov/hotel_rezerv_api/api"
-	db "sadagatasgarov/hotel_rezerv_api/storage"
-
 	"log"
+
+	"sadagatasgarov/hotel_rezerv_api/api"
+	"sadagatasgarov/hotel_rezerv_api/middleware"
+	db "sadagatasgarov/hotel_rezerv_api/storage"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -29,13 +30,20 @@ func main() {
 	}
 
 	var (
-		userHandler = api.NewUserHandler(db.NewMongoUserStore(client, db.DBNAME))
-		//hotelHandler := api.NewHotelHandler(db.NewMongoHotelStore(client), )
-		hotelStore   = db.NewMongoHotelStore(client)
-		roomStore    = db.NewMongoRoomStore(client, hotelStore)
-		hotelHandler = api.NewHotelHandler(hotelStore, roomStore)
-		app          = fiber.New(config)
-		apiv1        = app.Group("api/v1")
+		userStore   = db.NewMongoUserStore(client)
+		userHandler = api.NewUserHandler(userStore)
+
+		hotelStore = db.NewMongoHotelStore(client)
+		roomStore  = db.NewMongoRoomStore(client, hotelStore)
+		store      = db.Store{
+			Hotel: hotelStore,
+			User: userStore,
+			Room: roomStore,
+		}
+		hotelHandler = api.NewHotelHandler(&store)
+
+		app   = fiber.New(config)
+		apiv1 = app.Group("api/v1", middleware.JWTAuthentication)
 	)
 
 	apiv1.Get("/user", userHandler.HandleGetUsers)
