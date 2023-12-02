@@ -28,12 +28,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	userHandler := api.NewUserHandler(db.NewMongoUserStore(client, db.DBNAME))
-
-	app := fiber.New(config)
-	apiv1 := app.Group("api/v1")
-
-	app.Get("/foo", hanlerFunc)
+	var (
+		userHandler = api.NewUserHandler(db.NewMongoUserStore(client, db.DBNAME))
+		//hotelHandler := api.NewHotelHandler(db.NewMongoHotelStore(client), )
+		hotelStore   = db.NewMongoHotelStore(client)
+		roomStore    = db.NewMongoRoomStore(client, hotelStore)
+		hotelHandler = api.NewHotelHandler(hotelStore, roomStore)
+		app          = fiber.New(config)
+		apiv1        = app.Group("api/v1")
+	)
 
 	apiv1.Get("/user", userHandler.HandleGetUsers)
 	apiv1.Post("/user", userHandler.HandleCreateUser)
@@ -41,9 +44,11 @@ func main() {
 	apiv1.Delete("/user/:id", userHandler.HandleDeleteUser)
 	apiv1.Put("/user/:id", userHandler.HandleUpdateUser)
 
+	apiv1.Get("/hotel", hotelHandler.HandleGetHotels)
 	app.Listen(*listenAddr)
 }
 
-func hanlerFunc(c *fiber.Ctx) error {
-	return c.JSON(map[string]string{"msg": "working"})
-}
+// app.Get("/foo", hanlerFunc)
+// func hanlerFunc(c *fiber.Ctx) error {
+// 	return c.JSON(map[string]string{"msg": "working"})
+// }
