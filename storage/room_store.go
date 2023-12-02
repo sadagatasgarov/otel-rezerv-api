@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"sadagatasgarov/hotel_rezerv_api/types"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -11,6 +12,7 @@ import (
 
 type RoomStore interface {
 	InsertRoom(context.Context, *types.Room) (*types.Room, error)
+	GetRooms(context.Context, bson.M) ([]*types.Room, error)
 }
 
 type MongoRoomStore struct {
@@ -31,6 +33,20 @@ func NewMongoRoomStore(client *mongo.Client, hotelstore HotelStore) *MongoRoomSt
 func (s *MongoRoomStore) Update(ctx context.Context, filter bson.M, update bson.M) error {
 	_, err := s.coll.UpdateOne(ctx, filter, update)
 	return err
+}
+
+func (s *MongoRoomStore) GetRooms(ctx context.Context, filter bson.M) ([]*types.Room, error) {
+	resp, err := s.coll.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	
+	var rooms []*types.Room
+	if err:=resp.All(ctx, &rooms); err!=nil{
+		fmt.Println(rooms)
+		return nil, err
+	}
+	return rooms, nil
 }
 
 func (s *MongoRoomStore) InsertRoom(ctx context.Context, room *types.Room) (*types.Room, error) {

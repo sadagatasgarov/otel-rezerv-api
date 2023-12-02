@@ -23,7 +23,7 @@ func seedHotel(name string, location string, rating int) {
 	hotel := types.Hotel{
 		Name:     name,
 		Location: location,
-		Rooms:    []primitive.ObjectID{},
+		Rooms:    []*primitive.ObjectID{},
 		Rating: rating,
 	}
 
@@ -31,14 +31,17 @@ func seedHotel(name string, location string, rating int) {
 		{
 			Type:      types.SingleRoomType,
 			BasePrice: 88.9,
+			//HotelID: hotel.ID,
 		},
 		{
 			Type:      types.SingleRoomType,
 			BasePrice: 88.9,
+			//HotelID: hotel.ID,
 		},
 		{
 			Type:      types.SingleRoomType,
 			BasePrice: 88.9,
+			//HotelID: hotel.ID,
 		},
 	}
 
@@ -61,8 +64,6 @@ func main() {
 	seedHotel("Belus", "franc", 3)
 	seedHotel("Cozy", "franc", 2)
 	seedHotel("Hinter", "USA",5)
-
-
 
 }
 
