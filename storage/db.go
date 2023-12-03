@@ -10,13 +10,18 @@ func ToObjectID(id string) (primitive.ObjectID, error) {
 }
 
 const (
-	DBNAME   = "hotel-rezervation"
-	USERCOLL = "users"
-	DBURI    = "mongodb://root:example@localhost:27017/"
+	DBURI = "mongodb://root:example@localhost:27017/"
+
+	DBNAME    = "hotel-rezervation"
+	USERCOLL  = "users"
+	HOTELCOLL = "hotels"
+	ROOMCOLL  = "rooms"
+
+	TESTDBNAME = "test-hotel"
 )
 
 type Store struct {
-	User UserStore
+	User  UserStore
 	Hotel HotelStore
-	Room RoomStore
+	Room  RoomStore
 }

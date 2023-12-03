@@ -41,9 +41,14 @@ func main() {
 		}
 		hotelHandler = api.NewHotelHandler(&store)
 
+		authHandler = api.NewAuthHandler(userStore)
+
 		app   = fiber.New(config)
+		api   = app.Group("api")
 		apiv1 = app.Group("api/v1")
 	)
+
+	api.Post("/auth", authHandler.HandleAuth)
 
 	apiv1.Get("/user", userHandler.HandleGetUsers)
 	apiv1.Post("/user", userHandler.HandleCreateUser)
