@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"sadagatasgarov/hotel_rezerv_api/api"
+	"sadagatasgarov/hotel_rezerv_api/middleware"
 	db "sadagatasgarov/hotel_rezerv_api/storage"
 
 	"github.com/gofiber/fiber/v2"
@@ -45,7 +46,7 @@ func main() {
 
 		app   = fiber.New(config)
 		api   = app.Group("api")
-		apiv1 = app.Group("api/v1")
+		apiv1 = app.Group("api/v1", middleware.JWTAuthentication)
 	)
 
 	api.Post("/auth", authHandler.HandleAuth)

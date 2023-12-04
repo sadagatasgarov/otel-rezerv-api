@@ -4,10 +4,12 @@ import (
 	"errors"
 	"fmt"
 	db "sadagatasgarov/hotel_rezerv_api/storage"
+	"sadagatasgarov/hotel_rezerv_api/types"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"go.mongodb.org/mongo-driver/mongo"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthHandler struct {
@@ -25,6 +27,11 @@ type AuthParams struct {
 	Password string `json:"password"`
 }
 
+type AuthResponse struct {
+	User  *types.Users `json:"user"`
+	Token string       `json:"token"`
+}
+
 func (h *AuthHandler) HandleAuth(c *fiber.Ctx) error {
 	var params AuthParams
 	if err := c.BodyParser(&params); err != nil {
@@ -40,11 +47,34 @@ func (h *AuthHandler) HandleAuth(c *fiber.Ctx) error {
 		return err
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.EncryptedPassword), []byte(params.Password)); err != nil {
-		return c.JSON(map[string]string{"error": "Parolda ve ya emailde sehvlik var"})
+	if !types.IsValidPassword(user.EncryptedPassword, params.Password) {
+		fmt.Println("Invalid pass", user)
+	}
+
+	resp := AuthResponse{
+		User:  user,
+		Token: createTokenFromUser(user),
 	}
 
 	fmt.Println("authenticated->", user)
+	return c.JSON(resp)
+}
 
-	return c.JSON(user)
+func createTokenFromUser(user *types.Users) string {
+	now := time.Now()
+	validTill := now.Add(time.Hour * 4).Unix()
+	claims := jwt.MapClaims{
+		"id":        user.ID,
+		"email":     user.Email,
+		"validTill": validTill,
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	secret := []byte("salam")
+
+	tokenStr, err := token.SignedString(secret)
+	if err != nil {
+		fmt.Println("Token with secret erroru", err)
+	}
+	return tokenStr
 }

@@ -80,6 +80,13 @@ func (params CreateUserParams) Validate() map[string]string {
 	return nil
 }
 
+func IsValidPassword(encpw, pw string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(encpw), []byte(pw))
+
+	return err == nil
+
+}
+
 func isEmailValid(e string) bool {
 	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9._%+\-]+\.[a-z]{2,4}$`)
 	return emailRegex.MatchString(e)
