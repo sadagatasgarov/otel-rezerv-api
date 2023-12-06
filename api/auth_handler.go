@@ -49,6 +49,7 @@ func (h *AuthHandler) HandleAuth(c *fiber.Ctx) error {
 
 	if !types.IsValidPassword(user.EncryptedPassword, params.Password) {
 		fmt.Println("Invalid pass", user)
+		return fmt.Errorf("invalid credenlials pas")
 	}
 
 	resp := AuthResponse{

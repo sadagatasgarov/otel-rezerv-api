@@ -30,9 +30,8 @@ func main() {
 	}
 
 	var (
-		userStore   = db.NewMongoUserStore(client)
+		userStore   = db.NewMongoUserStore(client, db.DBNAME)
 		userHandler = api.NewUserHandler(userStore)
-
 		hotelStore = db.NewMongoHotelStore(client)
 		roomStore  = db.NewMongoRoomStore(client, hotelStore)
 		store      = db.Store{
