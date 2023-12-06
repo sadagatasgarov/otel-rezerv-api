@@ -32,8 +32,7 @@ func makeTestUser(t *testing.T, userStore db.UserStore) *types.Users {
 		t.Fatal(err)
 	}
 
-	fmt.Println(use)
-	return user
+	return use
 }
 
 func TestAuthenticateSuccess(t *testing.T) {
@@ -77,12 +76,11 @@ func TestAuthenticateSuccess(t *testing.T) {
 	}
 }
 
-
 func TestAuthenticateWrongPassFailure(t *testing.T) {
 	tdb := setup(t)
 	defer tdb.teardown(t)
 
-	insertedUser := makeTestUser(t, tdb.UserStore)
+	makeTestUser(t, tdb.UserStore)
 
 	app := fiber.New()
 	authHandler := NewAuthHandler(tdb.UserStore)
@@ -96,25 +94,16 @@ func TestAuthenticateWrongPassFailure(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/auth", bytes.NewReader(b))
 	req.Header.Add("Content-Type", "application/json")
 	resp, err := app.Test(req)
+
 	if err != nil {
 		t.Fatal(err)
 	}
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("expected status code 200 but %d", resp.StatusCode)
+	if resp.StatusCode != http.StatusBadRequest {
+		t.Fatalf("expected status code 400 but %d", resp.StatusCode)
 	}
 
-	var authResp AuthResponse
-	if err := json.NewDecoder(resp.Body).Decode(&authResp); err != nil {
+	var genResp genericResp
+	if err := json.NewDecoder(resp.Body).Decode(&genResp); err != nil {
 		t.Fatal(err)
-	}
-
-	if authResp.Token == "" {
-		t.Fatalf("expected the JWT token to be present in the auth response")
-	}
-	insertedUser.EncryptedPassword = ""
-	if !reflect.DeepEqual(insertedUser, authResp.User) {
-		fmt.Println(insertedUser)
-		fmt.Println(authResp.User)
-		t.Fatalf("expected the user to be inserted user")
 	}
 }

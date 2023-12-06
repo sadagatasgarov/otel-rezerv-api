@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	db "sadagatasgarov/hotel_rezerv_api/storage"
 
 	"github.com/gofiber/fiber/v2"
@@ -19,15 +18,13 @@ func NewHotelHandler(store *db.Store) *HotelHandler {
 	}
 }
 
-
-
 func (h *HotelHandler) HandleGetRooms(c *fiber.Ctx) error {
 	id := c.Params("id")
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err
 	}
-	fmt.Println(&oid)
+	//fmt.Println(&oid)
 	filter := bson.M{"hotelID": &oid}
 
 	rooms, err := h.store.Room.GetRooms(c.Context(), filter)

@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"sadagatasgarov/hotel_rezerv_api/types"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -40,10 +39,10 @@ func (s *MongoRoomStore) GetRooms(ctx context.Context, filter bson.M) ([]*types.
 	if err != nil {
 		return nil, err
 	}
-	
+
 	var rooms []*types.Room
-	if err:=resp.All(ctx, &rooms); err!=nil{
-		fmt.Println(rooms)
+	if err := resp.All(ctx, &rooms); err != nil {
+		//fmt.Println(rooms)
 		return nil, err
 	}
 	return rooms, nil

@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	db "sadagatasgarov/hotel_rezerv_api/storage"
 	"sadagatasgarov/hotel_rezerv_api/types"
 	"time"
@@ -32,24 +33,35 @@ type AuthResponse struct {
 	Token string       `json:"token"`
 }
 
+type genericResp struct {
+	Type string `json:"type"`
+	Msg  string `json:"msq"`
+}
+
+func invalidCredentials(c *fiber.Ctx) error {
+	return c.Status(http.StatusBadRequest).JSON(genericResp{
+		Type: "error",
+		Msg:  "Invalid Credentials",
+	})
+}
+
 func (h *AuthHandler) HandleAuth(c *fiber.Ctx) error {
 	var params AuthParams
 	if err := c.BodyParser(&params); err != nil {
 		return err
 	}
-	fmt.Println(params)
+	//fmt.Println(params)
 
 	user, err := h.userStore.GetUserByEmail(c.Context(), params.Email)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return c.JSON(map[string]string{"error": "Istifadeci yoxdut tapilmadi"})
 		}
-		return err
+		return invalidCredentials(c)
 	}
 
 	if !types.IsValidPassword(user.EncryptedPassword, params.Password) {
-		fmt.Println("Invalid pass", user)
-		return fmt.Errorf("invalid credenlials pas")
+		return invalidCredentials(c)
 	}
 
 	resp := AuthResponse{
@@ -57,7 +69,7 @@ func (h *AuthHandler) HandleAuth(c *fiber.Ctx) error {
 		Token: createTokenFromUser(user),
 	}
 
-	fmt.Println("authenticated->", user)
+	//fmt.Println("authenticated->", user)
 	return c.JSON(resp)
 }
 
