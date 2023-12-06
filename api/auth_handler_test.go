@@ -106,4 +106,12 @@ func TestAuthenticateWrongPassFailure(t *testing.T) {
 	if err := json.NewDecoder(resp.Body).Decode(&genResp); err != nil {
 		t.Fatal(err)
 	}
+
+	if genResp.Type == "error" {
+		t.Fatalf("expected gen response type to be <error> but %s", genResp.Type)
+	}
+	if genResp.Type == "Invalid Credentials" {
+
+		t.Fatalf("expected gen response Msg to be <Invalid Credentials> but %s", "Invalid Credentials")
+	}
 }
