@@ -10,7 +10,7 @@ import (
 )
 
 func JWTAuthentication(c *fiber.Ctx) error {
-	fmt.Println("isledi")
+	//fmt.Println("isledi")
 	token, ok := c.GetReqHeaders()["X-Api-Token"]
 	//fmt.Println(token)
 	if !ok {
@@ -20,7 +20,12 @@ func JWTAuthentication(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	exFloat := claims["validTill"].(float64)
+
+	if claims["expires"]==nil {
+		return fmt.Errorf("gecersiz token")
+	}
+
+	exFloat := claims["expires"].(float64)
 	exp := int64(exFloat)
 	if time.Now().Unix() > exp {
 		return fmt.Errorf("token expired")
