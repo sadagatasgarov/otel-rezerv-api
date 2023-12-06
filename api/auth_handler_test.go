@@ -114,4 +114,5 @@ func TestAuthenticateWrongPassFailure(t *testing.T) {
 
 		t.Fatalf("expected gen response Msg to be <invalid credentials> but %s", genResp.Msg)
 	}
+	
 }
