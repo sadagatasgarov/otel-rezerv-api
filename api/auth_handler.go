@@ -41,7 +41,7 @@ type genericResp struct {
 func invalidCredentials(c *fiber.Ctx) error {
 	return c.Status(http.StatusBadRequest).JSON(genericResp{
 		Type: "error",
-		Msg:  "Invalid Credentials",
+		Msg:  "invalid credentials",
 	})
 }
 

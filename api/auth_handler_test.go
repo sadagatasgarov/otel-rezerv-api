@@ -107,11 +107,11 @@ func TestAuthenticateWrongPassFailure(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if genResp.Type == "error" {
+	if genResp.Type != "error" {
 		t.Fatalf("expected gen response type to be <error> but %s", genResp.Type)
 	}
-	if genResp.Type == "Invalid Credentials" {
+	if genResp.Msg != "invalid credentials" {
 
-		t.Fatalf("expected gen response Msg to be <Invalid Credentials> but %s", "Invalid Credentials")
+		t.Fatalf("expected gen response Msg to be <invalid credentials> but %s", genResp.Msg)
 	}
 }
