@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	db "sadagatasgarov/hotel_rezerv_api/storage"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -9,29 +10,45 @@ import (
 	jwt "github.com/golang-jwt/jwt/v5"
 )
 
-func JWTAuthentication(c *fiber.Ctx) error {
-	//fmt.Println("isledi")
-	token, ok := c.GetReqHeaders()["X-Api-Token"]
-	//fmt.Println(token)
-	if !ok {
-		return fmt.Errorf("1unauthorized")
-	}
-	claims, err := parseJWTToken(token[len(token)-1])
-	if err != nil {
-		return err
-	}
+func JWTAuthentication(userStore db.UserStore) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		token, ok := c.GetReqHeaders()["X-Api-Token"]
+		if !ok {
+			return fmt.Errorf("1unauthorized")
+		}
 
-	if claims["expires"]==nil {
-		return fmt.Errorf("gecersiz token")
-	}
+		claims, err := parseJWTToken(token[len(token)-1])
+		if err != nil {
+			return err
+		}
 
-	exFloat := claims["expires"].(float64)
-	exp := int64(exFloat)
-	if time.Now().Unix() > exp {
-		return fmt.Errorf("token expired")
-	}
+		if claims["expires"] == nil {
+			return fmt.Errorf("gecersiz token")
+		}
 
-	return c.Next()
+		exFloat := claims["expires"].(float64)
+		exp := int64(exFloat)
+		if time.Now().Unix() > exp {
+			return fmt.Errorf("token expired")
+		}
+
+		// userID := claims["id"].(string)
+		// user, err := primitive.ObjectIDFromHex(userID)
+		// if err != nil {
+		// 	return err
+		// }
+
+		userID := claims["id"].(string)
+		user, err := userStore.GetUserById(c.Context(), userID)
+		if err != nil {
+			return fmt.Errorf("unauthorized")
+		}
+		//fmt.Println(user)
+		// Set the currenc
+		c.Context().SetUserValue("user", user)
+
+		return c.Next()
+	}
 }
 
 func parseJWTToken(tokenStr string) (jwt.MapClaims, error) {
