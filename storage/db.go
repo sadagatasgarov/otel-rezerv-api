@@ -16,6 +16,7 @@ const (
 	USERCOLL  = "users"
 	HOTELCOLL = "hotels"
 	ROOMCOLL  = "rooms"
+	BOOKCOLL = "book"
 
 	TESTDBNAME = "test-hotel"
 )
@@ -24,4 +25,5 @@ type Store struct {
 	User  UserStore
 	Hotel HotelStore
 	Room  RoomStore
+	Booking BookingStore
 }
