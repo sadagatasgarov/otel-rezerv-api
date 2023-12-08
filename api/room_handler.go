@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	db "sadagatasgarov/hotel_rezerv_api/storage"
@@ -41,13 +42,13 @@ func NewRoomHandler(store *db.Store) *RoomHandler {
 	}
 }
 
-func (h *RoomHandler) HandleGetBookings(c *fiber.Ctx) error {
-	bookings, err := h.store.Booking.GetBookings(c.Context(), nil)
+func (h *RoomHandler) HandleGetRooms(c *fiber.Ctx) error {
+	rooms, err := h.store.Room.GetRooms(c.Context(), nil)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(bookings)
+	return c.JSON(rooms)
 }
 
 func (h *RoomHandler) HandleBookRoom(c *fiber.Ctx) error {
@@ -75,34 +76,25 @@ func (h *RoomHandler) HandleBookRoom(c *fiber.Ctx) error {
 		})
 	}
 	//fmt.Println(user)
-	loc, _ := time.LoadLocation("Asia/Baku")
-	where := bson.M{
-		"roomID":roomID,
-		"fromDate": bson.M{
-			"$gte": params.FromDate.In(loc),
-		},
-		"tillDate": bson.M{
-			"$lte": params.TillDate.In(loc),
-		},
-	}
 
-	bookings, err := h.store.Booking.GetBookings(c.Context(), where)
+	ok, err = h.isRoomAvailableForBooking(c.Context(), roomID, params)
+
 	if err != nil {
 		return err
 	}
 
-	if len(bookings) > 0 {
+	if !ok {
 		return c.Status(http.StatusBadRequest).JSON(genericResp{
-				Type: "error",
-				Msg: fmt.Sprintf("room %+v already booked", roomID),
-			})
+			Type: "error",
+			Msg:  fmt.Sprintf("room %+v already booked", roomID),
+		})
 	}
 
 	booking := types.Booking{
 		UserID:     user.ID,
 		RoomID:     roomID,
-		FromDate:   params.FromDate.In(loc),
-		TillDate:   params.TillDate.In(loc),
+		FromDate:   params.FromDate,
+		TillDate:   params.TillDate,
 		NumPersons: params.NumPersons,
 	}
 
@@ -113,4 +105,25 @@ func (h *RoomHandler) HandleBookRoom(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(inserted)
+}
+
+func (h *RoomHandler) isRoomAvailableForBooking(ctx context.Context, roomID primitive.ObjectID, params BookRoomParams) (bool, error) {
+
+	where := bson.M{
+		"roomID": roomID,
+		"fromDate": bson.M{
+			"$gte": params.FromDate,
+		},
+		"tillDate": bson.M{
+			"$lte": params.TillDate,
+		},
+	}
+
+	bookings, err := h.store.Booking.GetRooms(ctx, where)
+	if err != nil {
+		return false, err
+	}
+
+	ok := len(bookings) == 0
+	return ok, nil
 }

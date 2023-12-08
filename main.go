@@ -68,7 +68,7 @@ func main() {
 	apiv1.Get("/hotel/:id/rooms", hotelHandler.HandleGetRooms)
 
 	apiv1.Post("/room/:id/book", roomHandler.HandleBookRoom)
-	apiv1.Get("/room/bookings", roomHandler.HandleGetBookings)
+	apiv1.Get("/rooms", roomHandler.HandleGetRooms)
 	app.Listen(*listenAddr)
 }
 
