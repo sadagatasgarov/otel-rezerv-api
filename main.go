@@ -30,33 +30,30 @@ func main() {
 	}
 
 	var (
-		userStore   = db.NewMongoUserStore(client, db.DBNAME)
-		userHandler = api.NewUserHandler(userStore)
-		hotelStore  = db.NewMongoHotelStore(client)
-		roomStore   = db.NewMongoRoomStore(client, hotelStore)
+		userStore    = db.NewMongoUserStore(client, db.DBNAME)
+		userHandler  = api.NewUserHandler(userStore)
+		hotelStore   = db.NewMongoHotelStore(client)
+		roomStore    = db.NewMongoRoomStore(client, hotelStore)
 		bookingStore = db.NewMongoBookStore(client)
-		store       = db.Store{
-			Hotel: hotelStore,
-			User:  userStore,
-			Room:  roomStore,
+		store        = db.Store{
+			Hotel:   hotelStore,
+			User:    userStore,
+			Room:    roomStore,
 			Booking: bookingStore,
 		}
-		hotelHandler = api.NewHotelHandler(&store)
-		
-		authHandler = api.NewAuthHandler(userStore)
-
-		roomHandler = api.NewRoomHandler(&store)
-
+		hotelHandler   = api.NewHotelHandler(&store)
+		authHandler    = api.NewAuthHandler(userStore)
+		roomHandler    = api.NewRoomHandler(&store)
 		bookingHandler = api.NewBookingHandler(&store)
-		app   = fiber.New(config)
-		api   = app.Group("api")
-		apiv1 = app.Group("api/v1", middleware.JWTAuthentication(userStore))
+		app            = fiber.New(config)
+		auth           = app.Group("/api")
+		apiv1 = app.Group("/api/v1", middleware.JWTAuthentication(userStore))
+		admin = apiv1.Group("/admin", middleware.AdminAuth)
 	)
 
-
 	// Versioned API routes
-	api.Post("/auth", authHandler.HandleAuth)
-
+	auth.Post("/auth", authHandler.HandleAuth)
+	auth.Post("/user", userHandler.HandleCreateUser)
 	// user handlers
 	apiv1.Get("/user", userHandler.HandleGetUsers)
 	apiv1.Post("/user", userHandler.HandleCreateUser)
@@ -74,7 +71,10 @@ func main() {
 	apiv1.Get("/rooms", roomHandler.HandleGetRooms)
 
 	// bookings handlers
-	apiv1.Get("/booking", bookingHandler.HandleGetBookings)
+	apiv1.Get("/booking/:id", bookingHandler.HandleGetBooking)
+
+	// admin handlers
+	admin.Get("/booking", bookingHandler.HandleGetBookings)
 	app.Listen(*listenAddr)
 }
 

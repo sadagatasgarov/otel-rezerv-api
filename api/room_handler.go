@@ -24,7 +24,7 @@ func (p BookRoomParams) validate() error {
 	if now.After(p.FromDate) || now.After(p.TillDate) {
 		return fmt.Errorf("cannot book a room in the past")
 	}
-	fmt.Println(p.TillDate)
+	//fmt.Println(p.TillDate)
 	if p.FromDate.Unix() > p.TillDate.Unix() {
 		return fmt.Errorf("bitme tarixi(%+v) Baslama tarixi(%+v)-den kicik ola bilmez.", p.FromDate, p.TillDate)
 	}
@@ -48,6 +48,7 @@ func (h *RoomHandler) HandleGetRooms(c *fiber.Ctx) error {
 		return err
 	}
 
+	
 	return c.JSON(rooms)
 }
 
@@ -60,14 +61,13 @@ func (h *RoomHandler) HandleBookRoom(c *fiber.Ctx) error {
 	if err := params.validate(); err != nil {
 		return err
 	}
-	//fmt.Println(params.FromDate)
+	fmt.Println(params.FromDate)
 
 	roomID, err := primitive.ObjectIDFromHex(c.Params("id"))
 	if err != nil {
 		return err
 	}
 
-	//fmt.Println(roomID)
 	user, ok := c.Context().Value("user").(*types.Users)
 	if !ok {
 		return c.Status(http.StatusInternalServerError).JSON(genericResp{
@@ -75,12 +75,12 @@ func (h *RoomHandler) HandleBookRoom(c *fiber.Ctx) error {
 			Msg:  "Internel Server error",
 		})
 	}
-	//fmt.Println(user)
 
+	//fmt.Println(roomID, params)
 	ok, err = h.isRoomAvailableForBooking(c.Context(), roomID, params)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("aaaaaaaaaa")
 	}
 
 	if !ok {
@@ -108,7 +108,6 @@ func (h *RoomHandler) HandleBookRoom(c *fiber.Ctx) error {
 }
 
 func (h *RoomHandler) isRoomAvailableForBooking(ctx context.Context, roomID primitive.ObjectID, params BookRoomParams) (bool, error) {
-
 	where := bson.M{
 		"roomID": roomID,
 		"fromDate": bson.M{
@@ -118,12 +117,15 @@ func (h *RoomHandler) isRoomAvailableForBooking(ctx context.Context, roomID prim
 			"$lte": params.TillDate,
 		},
 	}
-
-	bookings, err := h.store.Booking.GetRooms(ctx, where)
+	
+	bookings, err := h.store.Booking.GetBookings(ctx, where)
 	if err != nil {
-		return false, err
+		return false, nil
 	}
 
 	ok := len(bookings) == 0
+	if !ok {
+		return false, nil
+	}
 	return ok, nil
 }

@@ -3,13 +3,13 @@ package db
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"sadagatasgarov/hotel_rezerv_api/types"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
-
 
 type Dropper interface {
 	Drop(ctx context.Context) error
@@ -90,22 +90,25 @@ func (s *MongoUserStore) DeleteUser(ctx context.Context, id string) (*types.User
 }
 
 func (s *MongoUserStore) InsertUser(ctx context.Context, u *types.Users) (*types.Users, error) {
-	// usr, err := types.NewUserFromParams()
 
-	res, err := s.coll.InsertOne(ctx, u)
-
-	if err != nil {
-		return nil, err
+	var user *types.Users
+	if err := s.coll.FindOne(ctx, bson.D{{Key: "email", Value: u.Email}}).Decode(&user); err != nil {
+		res, err := s.coll.InsertOne(ctx, u)
+		if err != nil {
+			return nil, err
+		}
+		u.ID = res.InsertedID.(primitive.ObjectID)
+		return u, nil
 	}
-
-	u.ID = res.InsertedID.(primitive.ObjectID)
+	if reflect.DeepEqual(user.Email, u.Email) {
+		return nil, fmt.Errorf("email bazada movcuddur")
+	}
 
 	return u, nil
 }
 
 func (s *MongoUserStore) GetUsers(ctx context.Context) ([]*types.Users, error) {
 	var users []*types.Users
-
 	cur, err := s.coll.Find(ctx, bson.M{})
 	if err != nil {
 		return nil, err
