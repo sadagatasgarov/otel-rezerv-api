@@ -54,6 +54,8 @@ func main() {
 	// Versioned API routes
 	auth.Post("/auth", authHandler.HandleAuth)
 	auth.Post("/user", userHandler.HandleCreateUser)
+
+	
 	// user handlers
 	apiv1.Get("/user", userHandler.HandleGetUsers)
 	apiv1.Post("/user", userHandler.HandleCreateUser)
