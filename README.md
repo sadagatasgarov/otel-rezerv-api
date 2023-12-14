@@ -20,6 +20,8 @@ git branch -M main
 git push -uf origin main
 ```
 
+
+
 ## Integrate with your tools
 
 - [ ] [Set up project integrations](https://gitlab.com/sadagatasgarov/otel-rezervasiya-api/-/settings/integrations)
@@ -58,6 +60,9 @@ Choose a self-explaining name for your project.
 ## Description
 Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
 
+
+
+
 ## Badges
 On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
 
@@ -69,6 +74,28 @@ Within a particular ecosystem, there may be a common way of installing things, s
 
 ## Usage
 Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+
+Istifadecini gostermek idi ile
+(GET)
+localhost:5000/api/v1/user/656cd1ec686ede91fc8e2195
+
+
+Userlerin hamisini siralamaq
+(GET)
+localhost:5000/api/v1/user
+
+User yaratmaq
+(POST)
+localhost:5000/api/user
+```
+{
+  "firstName": "Ad 3-",
+  "lastName": "Soyad 3- ",
+    "email": "asd@asd.as",
+  "password": "Pdsfsdf"
+}
+
+```
 
 ## Support
 Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.

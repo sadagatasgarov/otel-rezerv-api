@@ -5,11 +5,12 @@ import (
 	"flag"
 	"log"
 
-	"sadagatasgarov/hotel_rezerv_api/api"
-	"sadagatasgarov/hotel_rezerv_api/middleware"
-	db "sadagatasgarov/hotel_rezerv_api/storage"
+	"gitlab.com/sadagatasgarov/otel-rezervasiya-api/api"
+	"gitlab.com/sadagatasgarov/otel-rezervasiya-api/middleware"
+	db "gitlab.com/sadagatasgarov/otel-rezervasiya-api/storage"
 
 	"github.com/gofiber/fiber/v2"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -21,7 +22,6 @@ var config = fiber.Config{
 }
 
 func main() {
-
 	listenAddr := flag.String("listenAddr", ":5000", "The listen addres of the API server")
 	flag.Parse()
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
@@ -47,15 +47,14 @@ func main() {
 		bookingHandler = api.NewBookingHandler(&store)
 		app            = fiber.New(config)
 		auth           = app.Group("/api")
-		apiv1 = app.Group("/api/v1", middleware.JWTAuthentication(userStore))
-		admin = apiv1.Group("/admin", middleware.AdminAuth)
+		apiv1          = app.Group("/api/v1", middleware.JWTAuthentication(userStore))
+		admin          = apiv1.Group("/admin", middleware.AdminAuth)
 	)
 
 	// Versioned API routes
 	auth.Post("/auth", authHandler.HandleAuth)
 	auth.Post("/user", userHandler.HandleCreateUser)
 
-	
 	// user handlers
 	apiv1.Get("/user", userHandler.HandleGetUsers)
 	apiv1.Post("/user", userHandler.HandleCreateUser)
@@ -74,13 +73,18 @@ func main() {
 
 	// bookings handlers
 	apiv1.Get("/booking/:id", bookingHandler.HandleGetBooking)
+	apiv1.Post("/booking/:id", bookingHandler.HandleCancelBooking)
 
 	// admin handlers
 	admin.Get("/booking", bookingHandler.HandleGetBookings)
+
 	app.Listen(*listenAddr)
+
 }
 
 // app.Get("/foo", hanlerFunc)
 // func hanlerFunc(c *fiber.Ctx) error {
 // 	return c.JSON(map[string]string{"msg": "working"})
 // }
+
+//35in   10:16

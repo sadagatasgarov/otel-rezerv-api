@@ -2,7 +2,8 @@ package db
 
 import (
 	"context"
-	"sadagatasgarov/hotel_rezerv_api/types"
+
+	"gitlab.com/sadagatasgarov/otel-rezervasiya-api/types"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -13,6 +14,7 @@ type BookingStore interface {
 	InsertBooking(context.Context, *types.Booking) (*types.Booking, error)
 	GetBookings(context.Context, bson.M) ([]*types.Booking, error)
 	GetBookingById(context.Context, string) (*types.Booking, error)
+	UpdateBooking(context.Context, string, bson.M) error
 }
 
 type MongoBookingStore struct {
@@ -26,6 +28,19 @@ func NewMongoBookStore(client *mongo.Client) *MongoBookingStore {
 		client: client,
 		coll:   client.Database(DBNAME).Collection(BOOKCOLL),
 	}
+}
+
+func (s *MongoBookingStore) UpdateBooking(ctx context.Context, id string, update bson.M) error {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	update = bson.M{"$set": update}
+	resp, err := s.coll.UpdateByID(ctx, oid, update)
+	_ = resp
+
+
+	return err
 }
 
 func (s *MongoBookingStore) InsertBooking(ctx context.Context, booking *types.Booking) (*types.Booking, error) {

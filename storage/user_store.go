@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 	"reflect"
-	"sadagatasgarov/hotel_rezerv_api/types"
+
+	"gitlab.com/sadagatasgarov/otel-rezervasiya-api/types"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -44,12 +45,12 @@ func (s *MongoUserStore) Drop(ctx context.Context) error {
 }
 
 func (s *MongoUserStore) UpdateUser(ctx context.Context, filter bson.M, params types.UpdateUserParams) error {
-
-	update := bson.D{
-		{
-			Key: "$set", Value: params.ToBSON(),
-		},
-	}
+	update := bson.M{"$set": params.ToBSON()}
+	// update := bson.D{
+	// 	{
+	// 		Key: "$set", Value: params.ToBSON(),
+	// 	},
+	// }
 	_, err := s.coll.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return err
@@ -105,6 +106,13 @@ func (s *MongoUserStore) InsertUser(ctx context.Context, u *types.Users) (*types
 	}
 
 	return u, nil
+
+	// res, err := s.coll.InsertOne(ctx, u)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// u.ID = res.InsertedID.(primitive.ObjectID)
+	// return u, nil
 }
 
 func (s *MongoUserStore) GetUsers(ctx context.Context) ([]*types.Users, error) {

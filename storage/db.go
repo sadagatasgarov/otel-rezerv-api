@@ -11,7 +11,7 @@ func ToObjectID(id string) (primitive.ObjectID, error) {
 
 const (
 	DBURI = "mongodb://root:example@localhost:27017/"
-
+	DBURIATLAS = "mongodb+srv://user:example@cluster0.nlvrqpz.mongodb.net/?retryWrites=true&w=majority"
 	DBNAME    = "hotel-rezervation"
 	USERCOLL  = "users"
 	HOTELCOLL = "hotels"

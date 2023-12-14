@@ -2,7 +2,7 @@ package db
 
 import (
 	"context"
-	"sadagatasgarov/hotel_rezerv_api/types"
+	"gitlab.com/sadagatasgarov/otel-rezervasiya-api/types"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

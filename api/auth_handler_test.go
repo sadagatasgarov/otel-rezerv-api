@@ -2,52 +2,31 @@ package api
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
-	db "sadagatasgarov/hotel_rezerv_api/storage"
-	"sadagatasgarov/hotel_rezerv_api/types"
 	"testing"
+
+	"gitlab.com/sadagatasgarov/otel-rezervasiya-api/storage/fixtures"
 
 	"github.com/gofiber/fiber/v2"
 )
-
-func makeTestUser(t *testing.T, userStore db.UserStore) *types.Users {
-	params := types.CreateUserParams{
-		FirstName: "fname",
-		LastName:  "lname",
-		Email:     "email@tst.txt",
-		Password:  "12345678",
-	}
-	user, err := types.NewUserFromParams(params)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	use, err := userStore.InsertUser(context.TODO(), user)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return use
-}
 
 func TestAuthenticateSuccess(t *testing.T) {
 	tdb := setup(t)
 	defer tdb.teardown(t)
 
-	insertedUser := makeTestUser(t, tdb.UserStore)
-
+	//insertedUser := makeTestUser(t, tdb.User)
+	insertedUser := fixtures.AddUser(tdb.Store, "sada", "asga", false)
 	app := fiber.New()
-	authHandler := NewAuthHandler(tdb.UserStore)
+	authHandler := NewAuthHandler(tdb.User)
 	app.Post("/auth", authHandler.HandleAuth)
 
 	params := AuthParams{
-		Email:    "email@tst.txt",
-		Password: "12345678",
+		Email:    "sada@asga.com",
+		Password: "sada_asga",
 	}
 	b, _ := json.Marshal(params)
 	req := httptest.NewRequest(http.MethodPost, "/auth", bytes.NewReader(b))
@@ -80,14 +59,14 @@ func TestAuthenticateWrongPassFailure(t *testing.T) {
 	tdb := setup(t)
 	defer tdb.teardown(t)
 
-	makeTestUser(t, tdb.UserStore)
-
+	//makeTestUser(t, tdb.User)
+	fixtures.AddUser(tdb.Store, "sada", "asga", false)
 	app := fiber.New()
-	authHandler := NewAuthHandler(tdb.UserStore)
+	authHandler := NewAuthHandler(tdb.User)
 	app.Post("/auth", authHandler.HandleAuth)
 
 	params := AuthParams{
-		Email:    "email@tst.txt",
+		Email:    "sada@asga.com",
 		Password: "123456789dsda",
 	}
 	b, _ := json.Marshal(params)
@@ -114,5 +93,5 @@ func TestAuthenticateWrongPassFailure(t *testing.T) {
 
 		t.Fatalf("expected gen response Msg to be <invalid credentials> but %s", genResp.Msg)
 	}
-	
+
 }

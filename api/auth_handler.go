@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	db "sadagatasgarov/hotel_rezerv_api/storage"
-	"sadagatasgarov/hotel_rezerv_api/types"
+	db "gitlab.com/sadagatasgarov/otel-rezervasiya-api/storage"
+	"gitlab.com/sadagatasgarov/otel-rezervasiya-api/types"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -66,14 +66,14 @@ func (h *AuthHandler) HandleAuth(c *fiber.Ctx) error {
 
 	resp := AuthResponse{
 		User:  user,
-		Token: createTokenFromUser(user),
+		Token: CreateTokenFromUser(user),
 	}
 
 	//fmt.Println("authenticated->", user)
 	return c.JSON(resp)
 }
 
-func createTokenFromUser(user *types.Users) string {
+func CreateTokenFromUser(user *types.Users) string {
 	now := time.Now()
 	expires := now.Add(time.Hour * 4).Unix()
 	claims := jwt.MapClaims{

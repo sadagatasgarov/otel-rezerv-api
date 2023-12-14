@@ -1,7 +1,7 @@
 package api
 
 import (
-	db "sadagatasgarov/hotel_rezerv_api/storage"
+	db "gitlab.com/sadagatasgarov/otel-rezervasiya-api/storage"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"

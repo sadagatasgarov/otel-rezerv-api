@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	db "sadagatasgarov/hotel_rezerv_api/storage"
-	"sadagatasgarov/hotel_rezerv_api/types"
 	"time"
+
+	db "gitlab.com/sadagatasgarov/otel-rezervasiya-api/storage"
+	"gitlab.com/sadagatasgarov/otel-rezervasiya-api/types"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -26,7 +27,7 @@ func (p BookRoomParams) validate() error {
 	}
 	//fmt.Println(p.TillDate)
 	if p.FromDate.Unix() > p.TillDate.Unix() {
-		return fmt.Errorf("bitme tarixi(%+v) Baslama tarixi(%+v)-den kicik ola bilmez.", p.FromDate, p.TillDate)
+		return fmt.Errorf("bitme tarixi(%+v) Baslama tarixi(%+v)-den kicik ola bilmez", p.FromDate, p.TillDate)
 	}
 
 	return nil
@@ -48,7 +49,6 @@ func (h *RoomHandler) HandleGetRooms(c *fiber.Ctx) error {
 		return err
 	}
 
-	
 	return c.JSON(rooms)
 }
 
@@ -117,7 +117,7 @@ func (h *RoomHandler) isRoomAvailableForBooking(ctx context.Context, roomID prim
 			"$lte": params.TillDate,
 		},
 	}
-	
+
 	bookings, err := h.store.Booking.GetBookings(ctx, where)
 	if err != nil {
 		return false, nil

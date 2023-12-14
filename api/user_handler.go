@@ -3,8 +3,9 @@ package api
 import (
 	"context"
 	"errors"
-	db "sadagatasgarov/hotel_rezerv_api/storage"
-	"sadagatasgarov/hotel_rezerv_api/types"
+
+	db "gitlab.com/sadagatasgarov/otel-rezervasiya-api/storage"
+	"gitlab.com/sadagatasgarov/otel-rezervasiya-api/types"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"

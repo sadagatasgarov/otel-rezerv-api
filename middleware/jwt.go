@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"fmt"
-	db "sadagatasgarov/hotel_rezerv_api/storage"
+	db "gitlab.com/sadagatasgarov/otel-rezervasiya-api/storage"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
