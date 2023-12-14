@@ -5,7 +5,7 @@ import (
 	"log"
 	"testing"
 
-	db "gitlab.com/sadagatasgarov/otel-rezervasiya-api/storage"
+	db "gitlab.com/sadagatasgarov/otel-rezerv-api/storage"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	db "gitlab.com/sadagatasgarov/otel-rezervasiya-api/storage"
-	"gitlab.com/sadagatasgarov/otel-rezervasiya-api/types"
+	db "gitlab.com/sadagatasgarov/otel-rezerv-api/storage"
+	"gitlab.com/sadagatasgarov/otel-rezerv-api/types"
 	"time"
 
 	"github.com/gofiber/fiber/v2"

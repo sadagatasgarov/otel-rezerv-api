@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"fmt"
-	"gitlab.com/sadagatasgarov/otel-rezervasiya-api/types"
+	"gitlab.com/sadagatasgarov/otel-rezerv-api/types"
 
 	"github.com/gofiber/fiber/v2"
 )

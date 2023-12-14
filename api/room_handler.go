@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	db "gitlab.com/sadagatasgarov/otel-rezervasiya-api/storage"
-	"gitlab.com/sadagatasgarov/otel-rezervasiya-api/types"
+	db "gitlab.com/sadagatasgarov/otel-rezerv-api/storage"
+	"gitlab.com/sadagatasgarov/otel-rezerv-api/types"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"

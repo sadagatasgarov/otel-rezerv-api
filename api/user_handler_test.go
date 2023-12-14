@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"gitlab.com/sadagatasgarov/otel-rezervasiya-api/types"
+	"gitlab.com/sadagatasgarov/otel-rezerv-api/types"
 
 	"testing"
 

@@ -6,9 +6,9 @@ import (
 	"log"
 	"time"
 
-	"gitlab.com/sadagatasgarov/otel-rezervasiya-api/api"
-	db "gitlab.com/sadagatasgarov/otel-rezervasiya-api/storage"
-	"gitlab.com/sadagatasgarov/otel-rezervasiya-api/storage/fixtures"
+	"gitlab.com/sadagatasgarov/otel-rezerv-api/api"
+	db "gitlab.com/sadagatasgarov/otel-rezerv-api/storage"
+	"gitlab.com/sadagatasgarov/otel-rezerv-api/storage/fixtures"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

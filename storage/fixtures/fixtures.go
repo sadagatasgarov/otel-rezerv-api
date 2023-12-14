@@ -6,8 +6,8 @@ import (
 	"log"
 	"time"
 
-	db "gitlab.com/sadagatasgarov/otel-rezervasiya-api/storage"
-	"gitlab.com/sadagatasgarov/otel-rezervasiya-api/types"
+	db "gitlab.com/sadagatasgarov/otel-rezerv-api/storage"
+	"gitlab.com/sadagatasgarov/otel-rezerv-api/types"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 

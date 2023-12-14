@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.com/sadagatasgarov/otel-rezervasiya-api/storage/fixtures"
+	"gitlab.com/sadagatasgarov/otel-rezerv-api/storage/fixtures"
 
 	"github.com/gofiber/fiber/v2"
 )

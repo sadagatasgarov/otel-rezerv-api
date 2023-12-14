@@ -1,4 +1,4 @@
-module gitlab.com/sadagatasgarov/otel-rezervasiya-api
+module gitlab.com/sadagatasgarov/otel-rezerv-api
 
 go 1.21
 

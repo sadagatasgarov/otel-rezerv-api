@@ -5,9 +5,9 @@ import (
 	"flag"
 	"log"
 
-	"gitlab.com/sadagatasgarov/otel-rezervasiya-api/api"
-	"gitlab.com/sadagatasgarov/otel-rezervasiya-api/middleware"
-	db "gitlab.com/sadagatasgarov/otel-rezervasiya-api/storage"
+	"gitlab.com/sadagatasgarov/otel-rezerv-api/api"
+	"gitlab.com/sadagatasgarov/otel-rezerv-api/middleware"
+	db "gitlab.com/sadagatasgarov/otel-rezerv-api/storage"
 
 	"github.com/gofiber/fiber/v2"
 

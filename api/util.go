@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
-	"gitlab.com/sadagatasgarov/otel-rezervasiya-api/types"
+	"gitlab.com/sadagatasgarov/otel-rezerv-api/types"
 )
 
 func getAuthUser(c *fiber.Ctx) (*types.Users, error) {
