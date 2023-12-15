@@ -23,7 +23,7 @@ func TestUserGetBooking(t *testing.T) {
 
 	var (
 		user = fixtures.AddUser(tdb.Store, "user", "admin", false)
-
+		user2 = fixtures.AddUser(tdb.Store, "user2", "admin", false)
 		hotel   = fixtures.AddHotel(tdb.Store, "Test oteli", "Namelum yer", 5, nil)
 		room    = fixtures.AddRoom(tdb.Store, "test _size", true, 50, hotel.ID, true)
 		booking = fixtures.AddBooking(tdb.Store, user.ID, room.ID, 3, time.Now(), time.Now().AddDate(0, 0, 2))
@@ -62,6 +62,21 @@ func TestUserGetBooking(t *testing.T) {
 		fmt.Println(getbooking)
 		t.Fatal("expected bookinng to be equal")
 	}
+
+
+	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/%s", booking.ID.Hex()), nil)
+	req.Header.Add("X-Api-Token", CreateTokenFromUser(user2))
+	req.Header.Add("Content-type", "application/json")
+	resp, err = app.Test(req, 3000)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		t.Fatalf("200 cavabi olmamalidir amma cavab %d-dur", resp.StatusCode)
+	}
+
+
 }
 
 func TestAdminGetBookings(t *testing.T) {
@@ -128,7 +143,7 @@ func TestAdminGetBookings(t *testing.T) {
 	}
 
 	if resp.StatusCode == http.StatusOK {
-		t.Fatalf("200 cavabi olmamalidir amma cavab %d-dur", getresp.StatusCode)
+		t.Fatalf("200 cavabi olmamalidir amma cavab %d-dur", resp.StatusCode)
 	}
 
 }
