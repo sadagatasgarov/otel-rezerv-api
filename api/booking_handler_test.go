@@ -44,11 +44,8 @@ func TestAdminGetBookings(t *testing.T) {
 	var data map[string]string
 	json.NewDecoder(resp1.Body).Decode(&data)
 	token := data["token"]
-
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("x-api-token", token)
-
-
 
 	bookHandler := NewBookingHandler(tdb.Store)
 	app.Get("/booklist", bookHandler.HandleGetBookings)
