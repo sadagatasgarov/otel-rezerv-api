@@ -1,7 +1,7 @@
 package api
 
 import (
-	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -11,50 +11,34 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"gitlab.com/sadagatasgarov/otel-rezerv-api/middleware"
 	"gitlab.com/sadagatasgarov/otel-rezerv-api/storage/fixtures"
 	"gitlab.com/sadagatasgarov/otel-rezerv-api/types"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func TestAdminGetBookings(t *testing.T) {
-	tdb := setup(t)
+	var (
+		tdb = setup(t)
+
+		adminUser = fixtures.AddUser(tdb.Store, "admin", "admin", true)
+		user      = fixtures.AddUser(tdb.Store, "user", "admin", false)
+
+		hotel   = fixtures.AddHotel(tdb.Store, "Test oteli", "Namelum yer", 5, nil)
+		room    = fixtures.AddRoom(tdb.Store, "test _size", true, 50, hotel.ID, true)
+		booking = fixtures.AddBooking(tdb.Store, user.ID, room.ID, 3, time.Now(), time.Now().AddDate(0, 0, 2))
+
+		app            = fiber.New()
+		admin          = app.Group("/", middleware.JWTAuthentication(tdb.User), middleware.AdminAuth)
+		bookingHandler = NewBookingHandler(tdb.Store)
+	)
 	defer tdb.teardown(t)
-	fixtures.AddUser(tdb.Store, "admin", "admin", true)
-	user := fixtures.AddUser(tdb.Store, "user", "admin", false)
-
-	hotel := fixtures.AddHotel(tdb.Store, "Test oteli", "Namelum yer", 5, nil)
-	room := fixtures.AddRoom(tdb.Store, "test _size", true, 50, hotel.ID, true)
-	booking := fixtures.AddBooking(tdb.Store, user.ID, room.ID, 3, time.Now(), time.Now().AddDate(0, 0, 2))
-
-	params := AuthParams{
-		Email:    "admin@admin.com",
-		Password: "admin_admin",
-	}
-	b, _ := json.Marshal(params)
-
-	app := fiber.New()
-	authHandler := NewAuthHandler(tdb.User)
-	bookHandler := NewBookingHandler(tdb.Store)
-
-	app.Post("/auth", authHandler.HandleAuth)
-
-	// Giris edirik
-	req := httptest.NewRequest(http.MethodPost, "/auth", bytes.NewReader(b))
-	authresp, err := app.Test(req, 2000)
-	if err != nil {
-		t.Fatal(err)
-	}
-	var data map[string]string
-	json.NewDecoder(authresp.Body).Decode(&data)
-	token := data["token"]
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("x-api-token", token)
-
-	app.Get("/booking", bookHandler.HandleGetBooking)
-
 	// rezerv edilmis otaqlari siralayiriq
-	app.Get("/booking", bookHandler.HandleGetBookings)
-	req = httptest.NewRequest(http.MethodGet, "/booking", nil)
-	getresp, err := app.Test(req, 2000)
+	admin.Get("/bookings", bookingHandler.HandleGetBookings)
+	req := httptest.NewRequest(http.MethodGet, "/bookings", nil)
+	req.Header.Add("X-Api-Token", CreateTokenFromUser(adminUser))
+	req.Header.Add("Content-type", "application/json")
+	getresp, err := app.Test(req, 3000)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -63,14 +47,8 @@ func TestAdminGetBookings(t *testing.T) {
 		t.Fatalf("non 200 response %d", getresp.StatusCode)
 	}
 
-	// bookings, err := tdb.Booking.GetBookings(context.TODO(), bson.M{})
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
-
-	var postbooking *types.Booking
-	if err := json.NewDecoder(postresp.Body).Decode(&postbooking); err != nil {
-		fmt.Println(postbooking)
+	bookings, err := tdb.Booking.GetBookings(context.TODO(), bson.M{})
+	if err != nil {
 		t.Fatal(err)
 	}
 
@@ -83,9 +61,13 @@ func TestAdminGetBookings(t *testing.T) {
 		t.Fatalf("expected 1 booking gor %d ", len(getbookings))
 	}
 
-	if !reflect.DeepEqual(postbooking, getbookings[0]) {
-		fmt.Println(booking)
-		fmt.Println(getbookings[0])
+	if booking.ID != getbookings[0].ID {
+		t.Fatal("Id ller uygun gelmir")
+	}
+	if !reflect.DeepEqual(bookings, getbookings) {
+		fmt.Println(bookings)
+		fmt.Println(getbookings)
 		t.Fatal("expected bookinng to be equal")
 	}
+
 }
