@@ -17,10 +17,57 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func TestAdminGetBookings(t *testing.T) {
-	var (
-		tdb = setup(t)
+func TestUserGetBooking(t *testing.T) {
+	tdb := setup(t)
+	defer tdb.teardown(t)
 
+	var (
+		user = fixtures.AddUser(tdb.Store, "user", "admin", false)
+
+		hotel   = fixtures.AddHotel(tdb.Store, "Test oteli", "Namelum yer", 5, nil)
+		room    = fixtures.AddRoom(tdb.Store, "test _size", true, 50, hotel.ID, true)
+		booking = fixtures.AddBooking(tdb.Store, user.ID, room.ID, 3, time.Now(), time.Now().AddDate(0, 0, 2))
+
+		app            = fiber.New()
+		route          = app.Group("/", middleware.JWTAuthentication(tdb.User))
+		bookingHandler = NewBookingHandler(tdb.Store)
+	)
+
+	route.Get("/:id", bookingHandler.HandleGetBooking)
+	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/%s", booking.ID.Hex()), nil)
+	req.Header.Add("Content-type", "application/json")
+	req.Header.Add("X-Api-Token", CreateTokenFromUser(user))
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("non 200 response %d", resp.StatusCode)
+	}
+
+	bookingd, err := tdb.Booking.GetBookingById(context.TODO(), booking.ID.Hex())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	
+	var getbooking *types.Booking
+	if err := json.NewDecoder(resp.Body).Decode(&getbooking); err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(bookingd, getbooking){
+		fmt.Println(bookingd)
+		fmt.Println(getbooking)
+		t.Fatal("expected bookinng to be equal")
+	}
+}
+
+func TestAdminGetBookings(t *testing.T) {
+	tdb := setup(t)
+	defer tdb.teardown(t)
+	var (
 		adminUser = fixtures.AddUser(tdb.Store, "admin", "admin", true)
 		user      = fixtures.AddUser(tdb.Store, "user", "admin", false)
 
@@ -32,7 +79,7 @@ func TestAdminGetBookings(t *testing.T) {
 		admin          = app.Group("/", middleware.JWTAuthentication(tdb.User), middleware.AdminAuth)
 		bookingHandler = NewBookingHandler(tdb.Store)
 	)
-	defer tdb.teardown(t)
+
 	// rezerv edilmis otaqlari siralayiriq
 	admin.Get("/bookings", bookingHandler.HandleGetBookings)
 	req := httptest.NewRequest(http.MethodGet, "/bookings", nil)
@@ -44,7 +91,7 @@ func TestAdminGetBookings(t *testing.T) {
 	}
 
 	if getresp.StatusCode != http.StatusOK {
-		t.Fatalf("non 200 response %d", getresp.StatusCode)
+		t.Fatalf("200 cavabi olmalidir amma cavab %d-dur", getresp.StatusCode)
 	}
 
 	bookings, err := tdb.Booking.GetBookings(context.TODO(), bson.M{})
@@ -64,10 +111,24 @@ func TestAdminGetBookings(t *testing.T) {
 	if booking.ID != getbookings[0].ID {
 		t.Fatal("Id ller uygun gelmir")
 	}
+
 	if !reflect.DeepEqual(bookings, getbookings) {
 		fmt.Println(bookings)
 		fmt.Println(getbookings)
 		t.Fatal("expected bookinng to be equal")
+	}
+
+	// test admin olmayan istifadeci
+	req = httptest.NewRequest(http.MethodGet, "/bookings", nil)
+	req.Header.Add("X-Api-Token", CreateTokenFromUser(user))
+	req.Header.Add("Content-type", "application/json")
+	resp, err := app.Test(req, 3000)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		t.Fatalf("200 cavabi olmamalidir amma cavab %d-dur", getresp.StatusCode)
 	}
 
 }
