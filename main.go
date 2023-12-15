@@ -16,8 +16,11 @@ import (
 )
 
 var config = fiber.Config{
-	ErrorHandler: func(ctx *fiber.Ctx, err error) error {
-		return ctx.JSON(map[string]string{"error": err.Error()})
+	ErrorHandler: func(c *fiber.Ctx, err error) error {
+		if apiError, ok:=err.(api.Error);ok{
+			return c.Status(apiError.Code).JSON(apiError)
+		}
+		return c.JSON(map[string]string{"error": err.Error()})
 	},
 }
 
