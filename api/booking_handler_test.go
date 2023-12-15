@@ -37,12 +37,12 @@ func TestAdminGetBookings(t *testing.T) {
 	app.Post("/bookpost", authHandler.HandleAuth)
 
 	req := httptest.NewRequest(http.MethodPost, "/bookpost", bytes.NewReader(b))
-	resp1, err := app.Test(req, 2000)
+	postresp, err := app.Test(req, 2000)
 	if err != nil {
 		t.Fatal(err)
 	}
 	var data map[string]string
-	json.NewDecoder(resp1.Body).Decode(&data)
+	json.NewDecoder(postresp.Body).Decode(&data)
 	token := data["token"]
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("x-api-token", token)
@@ -50,12 +50,12 @@ func TestAdminGetBookings(t *testing.T) {
 	bookHandler := NewBookingHandler(tdb.Store)
 	app.Get("/booklist", bookHandler.HandleGetBookings)
 	req = httptest.NewRequest(http.MethodGet, "/booklist", nil)
-	resp2, err := app.Test(req, 2000)
+	getresp, err := app.Test(req, 2000)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if resp2.StatusCode != http.StatusOK {
-		t.Fatalf("non 200 response %d", resp2.StatusCode)
+	if getresp.StatusCode != http.StatusOK {
+		t.Fatalf("non 200 response %d", getresp.StatusCode)
 	}
 
 	// bookings, err := tdb.Booking.GetBookings(context.TODO(), bson.M{})
@@ -63,23 +63,23 @@ func TestAdminGetBookings(t *testing.T) {
 	// 	t.Fatal(err)
 	// }
 
-	var respbooking *types.Booking
-	if err := json.NewDecoder(resp1.Body).Decode(&respbooking); err != nil {
+	var postbooking *types.Booking
+	if err := json.NewDecoder(postresp.Body).Decode(&postbooking); err != nil {
 		t.Fatal(err)
 	}
 
-	var respbookings []*types.Booking
-	if err := json.NewDecoder(resp2.Body).Decode(&respbookings); err != nil {
+	var getbookings []*types.Booking
+	if err := json.NewDecoder(getresp.Body).Decode(&getbookings); err != nil {
 		t.Fatal(err)
 	}
 
-	if len(respbookings) != 1 {
-		t.Fatalf("expected 1 booking gor %d ", len(respbookings))
+	if len(getbookings) != 1 {
+		t.Fatalf("expected 1 booking gor %d ", len(getbookings))
 	}
 
-	if !reflect.DeepEqual(respbooking, respbookings[0]) {
+	if !reflect.DeepEqual(postbooking, getbookings[0]) {
 		fmt.Println(booking)
-		fmt.Println(respbookings[0])
+		fmt.Println(getbookings[0])
 		t.Fatal("expected bookinng to be equal")
 	}
 }
