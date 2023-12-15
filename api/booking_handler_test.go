@@ -33,9 +33,12 @@ func TestAdminGetBookings(t *testing.T) {
 
 	app := fiber.New()
 	authHandler := NewAuthHandler(tdb.User)
+	bookHandler := NewBookingHandler(tdb.Store)
 
 	app.Post("/bookpost", authHandler.HandleAuth)
+	app.Get("/booklist", bookHandler.HandleGetBookings)
 
+	// buradada rezeerv edirik otagi
 	req := httptest.NewRequest(http.MethodPost, "/bookpost", bytes.NewReader(b))
 	postresp, err := app.Test(req, 2000)
 	if err != nil {
@@ -47,13 +50,13 @@ func TestAdminGetBookings(t *testing.T) {
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("x-api-token", token)
 
-	bookHandler := NewBookingHandler(tdb.Store)
-	app.Get("/booklist", bookHandler.HandleGetBookings)
+	// rezerv edilmis otaqlari siralayiriq
 	req = httptest.NewRequest(http.MethodGet, "/booklist", nil)
 	getresp, err := app.Test(req, 2000)
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	if getresp.StatusCode != http.StatusOK {
 		t.Fatalf("non 200 response %d", getresp.StatusCode)
 	}
