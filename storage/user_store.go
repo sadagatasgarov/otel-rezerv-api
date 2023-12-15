@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	"gitlab.com/sadagatasgarov/otel-rezerv-api/types"
 
@@ -75,27 +76,27 @@ func (s *MongoUserStore) DeleteUser(ctx context.Context, id string) (*types.User
 
 func (s *MongoUserStore) InsertUser(ctx context.Context, u *types.Users) (*types.Users, error) {
 
-	// var user *types.Users
-	// if err := s.coll.FindOne(ctx, bson.D{{Key: "email", Value: u.Email}}).Decode(&user); err != nil {
-	// 	res, err := s.coll.InsertOne(ctx, u)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	u.ID = res.InsertedID.(primitive.ObjectID)
-	// 	return u, nil
-	// }
-	// if reflect.DeepEqual(user.Email, u.Email) {
-	// 	return nil, fmt.Errorf("email bazada movcuddur")
-	// }
-
-	// return u, nil
-
-	res, err := s.coll.InsertOne(ctx, u)
-	if err != nil {
-		return nil, err
+	var user *types.Users
+	if err := s.coll.FindOne(ctx, bson.D{{Key: "email", Value: u.Email}}).Decode(&user); err != nil {
+		res, err := s.coll.InsertOne(ctx, u)
+		if err != nil {
+			return nil, err
+		}
+		u.ID = res.InsertedID.(primitive.ObjectID)
+		return u, nil
 	}
-	u.ID = res.InsertedID.(primitive.ObjectID)
+	if reflect.DeepEqual(user.Email, u.Email) {
+		return nil, fmt.Errorf("email bazada movcuddur")
+	}
+
 	return u, nil
+
+	// res, err := s.coll.InsertOne(ctx, u)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// u.ID = res.InsertedID.(primitive.ObjectID)
+	// return u, nil
 }
 
 func (s *MongoUserStore) GetUsers(ctx context.Context) ([]*types.Users, error) {

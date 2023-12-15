@@ -19,7 +19,7 @@ func TestAdminGetBookings(t *testing.T) {
 	tdb := setup(t)
 	defer tdb.teardown(t)
 	fixtures.AddUser(tdb.Store, "admin", "admin", true)
-	user := fixtures.AddUser(tdb.Store, "user", "admin", true)
+	user := fixtures.AddUser(tdb.Store, "user", "admin", false)
 
 
 	hotel := fixtures.AddHotel(tdb.Store, "Test oteli", "Namelum yer", 5, nil)
