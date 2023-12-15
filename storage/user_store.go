@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"fmt"
-	"reflect"
 
 	"gitlab.com/sadagatasgarov/otel-rezerv-api/types"
 
@@ -31,11 +30,11 @@ type MongoUserStore struct {
 	coll   *mongo.Collection
 }
 
-func NewMongoUserStore(c *mongo.Client, dbname string) *MongoUserStore {
+func NewMongoUserStore(c *mongo.Client) *MongoUserStore {
 
 	return &MongoUserStore{
 		client: c,
-		coll:   c.Database(dbname).Collection(USERCOLL),
+		coll:   c.Database(DBNAME).Collection(USERCOLL),
 	}
 }
 
@@ -58,22 +57,6 @@ func (s *MongoUserStore) UpdateUser(ctx context.Context, filter bson.M, params t
 	return nil
 }
 
-// func (s *MongoUserStore) UpdateUser(ctx context.Context, id string, u *types.Users) (*types.Users, error) {
-// 	oid, err := primitive.ObjectIDFromHex(id)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	var user types.Users
-// 	if err := s.coll.FindOne(ctx, bson.M{"_id": oid}).Decode(&user); err != nil {
-// 		return nil, err
-// 	}
-
-// 	_, err = s.coll.UpdateOne(ctx, user, u)
-
-// 	return &user, nil
-// }
-
 func (s *MongoUserStore) DeleteUser(ctx context.Context, id string) (*types.Users, error) {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -92,27 +75,27 @@ func (s *MongoUserStore) DeleteUser(ctx context.Context, id string) (*types.User
 
 func (s *MongoUserStore) InsertUser(ctx context.Context, u *types.Users) (*types.Users, error) {
 
-	var user *types.Users
-	if err := s.coll.FindOne(ctx, bson.D{{Key: "email", Value: u.Email}}).Decode(&user); err != nil {
-		res, err := s.coll.InsertOne(ctx, u)
-		if err != nil {
-			return nil, err
-		}
-		u.ID = res.InsertedID.(primitive.ObjectID)
-		return u, nil
-	}
-	if reflect.DeepEqual(user.Email, u.Email) {
-		return nil, fmt.Errorf("email bazada movcuddur")
-	}
-
-	return u, nil
-
-	// res, err := s.coll.InsertOne(ctx, u)
-	// if err != nil {
-	// 	return nil, err
+	// var user *types.Users
+	// if err := s.coll.FindOne(ctx, bson.D{{Key: "email", Value: u.Email}}).Decode(&user); err != nil {
+	// 	res, err := s.coll.InsertOne(ctx, u)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	u.ID = res.InsertedID.(primitive.ObjectID)
+	// 	return u, nil
 	// }
-	// u.ID = res.InsertedID.(primitive.ObjectID)
+	// if reflect.DeepEqual(user.Email, u.Email) {
+	// 	return nil, fmt.Errorf("email bazada movcuddur")
+	// }
+
 	// return u, nil
+
+	res, err := s.coll.InsertOne(ctx, u)
+	if err != nil {
+		return nil, err
+	}
+	u.ID = res.InsertedID.(primitive.ObjectID)
+	return u, nil
 }
 
 func (s *MongoUserStore) GetUsers(ctx context.Context) ([]*types.Users, error) {

@@ -30,17 +30,16 @@ func main() {
 	store := &db.Store{
 		Hotel:   hotelStore,
 		Room:    db.NewMongoRoomStore(client, hotelStore),
-		User:    db.NewMongoUserStore(client, db.DBNAME),
+		User:    db.NewMongoUserStore(client),
 		Booking: db.NewMongoBookStore(client),
 	}
 
 	admin := fixtures.AddUser(store, "admin", "admin", true)
-	fmt.Println(admin)
-	fmt.Println("user -->", admin.ID, api.CreateTokenFromUser(admin))
-
-	user := fixtures.AddUser(store, "sada", "asga", false)
-	fmt.Println(user)
-	fmt.Println("user -->", user.ID, api.CreateTokenFromUser(user))
+	fmt.Println("admin -->", admin.Email, admin.ID, api.CreateTokenFromUser(admin))
+	fmt.Println()
+	user := fixtures.AddUser(store, "user", "user", false)
+	fmt.Println("user  -->", user.Email, user.ID, api.CreateTokenFromUser(user))
+	fmt.Println()
 
 	hotel := fixtures.AddHotel(store, "Tebriz", "Nakhchivan", 5, nil)
 	fmt.Println("hotel ----> ", hotel)

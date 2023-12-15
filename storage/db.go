@@ -17,7 +17,6 @@ const (
 	HOTELCOLL = "hotels"
 	ROOMCOLL  = "rooms"
 	BOOKCOLL = "book"
-
 	TESTDBNAME = "test-hotel"
 )
 

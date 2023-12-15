@@ -17,13 +17,11 @@ import (
 func TestAuthenticateSuccess(t *testing.T) {
 	tdb := setup(t)
 	defer tdb.teardown(t)
+	insertedUser := fixtures.AddUser(tdb.Store, "sada1", "asga1", false)
 
-	//insertedUser := makeTestUser(t, tdb.User)
-	insertedUser := fixtures.AddUser(tdb.Store, "sada", "asga", false)
 	app := fiber.New()
 	authHandler := NewAuthHandler(tdb.User)
 	app.Post("/auth", authHandler.HandleAuth)
-
 	params := AuthParams{
 		Email:    "sada@asga.com",
 		Password: "sada_asga",
@@ -60,13 +58,13 @@ func TestAuthenticateWrongPassFailure(t *testing.T) {
 	defer tdb.teardown(t)
 
 	//makeTestUser(t, tdb.User)
-	fixtures.AddUser(tdb.Store, "sada", "asga", false)
+	fixtures.AddUser(tdb.Store, "sada1", "asga1", false)
 	app := fiber.New()
 	authHandler := NewAuthHandler(tdb.User)
 	app.Post("/auth", authHandler.HandleAuth)
 
 	params := AuthParams{
-		Email:    "sada@asga.com",
+		Email:    "sada1@asga1.com",
 		Password: "123456789dsda",
 	}
 	b, _ := json.Marshal(params)

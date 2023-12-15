@@ -16,7 +16,7 @@ import (
 //opts := options.Client().ApplyURI("mongodb+srv://<username>:<password>@cluster0.nlvrqpz.mongodb.net/?retryWrites=true&w=majority").SetServerAPIOptions(serverAPI)
 
 //var testuri = "mongodb://root:example@localhost:27017/"
-//var testuriatlas = "mongodb+srv://user:example@cluster0.nlvrqpz.mongodb.net/?retryWrites=true&w=majority"
+//var testuriatlas = "mongodb+srv://user:example@ping /?retryWrites=true&w=majority"
 //mongodb+srv://<username>:<password>@cluster0.nlvrqpz.mongodb.net/?retryWrites=true&w=majority
 //var testdbname = "test-hotel-rezervation"
 // var testuserColl = "test-users"
@@ -39,9 +39,8 @@ func TestPostUser(t *testing.T) {
 
 	b, _ := json.Marshal(params)
 	req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(b))
-
 	req.Header.Add("Content-Type", "application/json")
-	resp, err := app.Test(req, 3000)
+	resp, err := app.Test(req, 2000)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -68,5 +67,4 @@ func TestPostUser(t *testing.T) {
 		t.Fatalf("expected Email %s but got %s", params.Email, user.Email)
 	}
 
-	//fmt.Println(user)
 }
