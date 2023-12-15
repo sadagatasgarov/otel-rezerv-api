@@ -39,6 +39,7 @@ func TestPostUser(t *testing.T) {
 
 	b, _ := json.Marshal(params)
 	req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(b))
+
 	req.Header.Add("Content-Type", "application/json")
 	resp, err := app.Test(req, 2000)
 	if err != nil {
@@ -67,4 +68,5 @@ func TestPostUser(t *testing.T) {
 		t.Fatalf("expected Email %s but got %s", params.Email, user.Email)
 	}
 
+	//fmt.Println(user)
 }

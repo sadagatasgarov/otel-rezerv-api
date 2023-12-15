@@ -12,70 +12,20 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/sadagatasgarov/otel-rezerv-api/storage/fixtures"
-	"gitlab.com/sadagatasgarov/otel-rezerv-api/types"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func TestAdminGetBookings(t *testing.T) {
 	tdb := setup(t)
 	defer tdb.teardown(t)
 	fixtures.AddUser(tdb.Store, "admin", "admin", true)
+	user := fixtures.AddUser(tdb.Store, "user", "admin", true)
 
-	//hotel := fixtures.AddHotel(tdb.Store, "Test oteli", "Namelum yer", 5, nil)
-	//room := fixtures.AddRoom(tdb.Store, "test _size", true, 50, hotel.ID, true)
-	//fixtures.AddBooking(tdb.Store, user1.ID, room.ID, 3, time.Now(), time.Now().AddDate(0, 0, 2))
-	user, err := types.NewUserFromParams(types.CreateUserParams{
-		FirstName: "sada",
-		LastName:  "asga",
-		Email:     "sada@asga.com",
-		Password:  "sada_asga",
-		IsAdmin:   false,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	user, err = tdb.User.InsertUser(context.TODO(), user)
-	if err != nil {
-		t.Fatal(err)
-	}
+
+	hotel := fixtures.AddHotel(tdb.Store, "Test oteli", "Namelum yer", 5, nil)
+	room := fixtures.AddRoom(tdb.Store, "test _size", true, 50, hotel.ID, true)
+	fixtures.AddBooking(tdb.Store, user.ID, room.ID, 3, time.Now(), time.Now().AddDate(0, 0, 2))
 	
-	var roomIDS []*primitive.ObjectID
-	if roomIDS == nil {
-		roomIDS = []*primitive.ObjectID{}
-	}
-	hotel, err := tdb.Hotel.Insert(context.TODO(), &types.Hotel{
-		Name:     "Test Oteli",
-		Location: "namelum_yer",
-		Rooms:    roomIDS,
-		Rating:   5,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	room, err := tdb.Room.InsertRoom(context.TODO(), &types.Room{
-		Size:      "Luks",
-		Seaside:   true,
-		Price:     55,
-		HotelID:   hotel.ID,
-		Available: true,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	booking, err := tdb.Booking.InsertBooking(context.TODO(), &types.Booking{
-		UserID:     user.ID,
-		RoomID:     room.ID,
-		NumPersons: 5,
-		FromDate:   time.Now(),
-		TillDate:   time.Now().AddDate(0, 0, 2),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	app := fiber.New()
 	authHandler := NewAuthHandler(tdb.User)
 	app.Post("/booklist", authHandler.HandleAuth)
@@ -101,9 +51,10 @@ func TestAdminGetBookings(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	fmt.Println(booking.ID)
 	for _, v := range listbooking {
 		fmt.Println(v)
+
 	}
 
+	//fmt.Println(CreateTokenFromUser(insertedUser))
 }

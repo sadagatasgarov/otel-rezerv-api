@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 
 	"gitlab.com/sadagatasgarov/otel-rezerv-api/types"
 
@@ -30,6 +31,11 @@ func NewMongoBookStore(client *mongo.Client) *MongoBookingStore {
 	}
 }
 
+func (s *MongoBookingStore) Drop(ctx context.Context) error {
+	fmt.Println("Dropping user collection bu isledi")
+	return s.coll.Drop(ctx)
+}
+
 func (s *MongoBookingStore) UpdateBooking(ctx context.Context, id string, update bson.M) error {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -38,7 +44,6 @@ func (s *MongoBookingStore) UpdateBooking(ctx context.Context, id string, update
 	update = bson.M{"$set": update}
 	resp, err := s.coll.UpdateByID(ctx, oid, update)
 	_ = resp
-
 
 	return err
 }

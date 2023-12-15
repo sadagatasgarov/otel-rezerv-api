@@ -2,6 +2,8 @@ package db
 
 import (
 	"context"
+	"fmt"
+
 	"gitlab.com/sadagatasgarov/otel-rezerv-api/types"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -28,6 +30,10 @@ func NewMongoHotelStore(client *mongo.Client) *MongoHotelStore {
 	}
 }
 
+func (s *MongoHotelStore) Drop(ctx context.Context) error {
+	fmt.Println("Dropping user collection bu isledi")
+	return s.coll.Drop(ctx)
+}
 func (s *MongoHotelStore) Update(ctx context.Context, filter bson.M, update bson.M) error {
 	_, err := s.coll.UpdateOne(ctx, filter, update)
 	return err
@@ -58,7 +64,7 @@ func (s *MongoHotelStore) GetHotels(ctx context.Context, filter bson.M) ([]*type
 
 func (s *MongoHotelStore) GetHotel(ctx context.Context, oid primitive.ObjectID) (*types.Hotel, error) {
 	var hotel *types.Hotel
-	if err:=s.coll.FindOne(ctx, bson.M{"_id":oid}).Decode(&hotel); err!=nil{
+	if err := s.coll.FindOne(ctx, bson.M{"_id": oid}).Decode(&hotel); err != nil {
 		return nil, err
 	}
 	return hotel, nil

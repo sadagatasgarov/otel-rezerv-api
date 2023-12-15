@@ -17,15 +17,16 @@ type testdb struct {
 
 func (tdb *testdb) teardown(t *testing.T) {
 
-	if err := tdb.client.Database(db.TESTDBNAME).Drop(context.TODO()); err != nil {
+	if err := tdb.client.Database(db.DBNAME).Drop(context.TODO()); err != nil {
 		t.Fatal(err)
 	}
 
 }
 
 func setup(t *testing.T) *testdb {
-	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURIATLAS).SetServerAPIOptions(serverAPI))
+	//serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
+	//.SetServerAPIOptions(serverAPI))
 	if err != nil {
 		log.Fatal(err)
 	}

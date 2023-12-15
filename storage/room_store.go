@@ -2,6 +2,8 @@ package db
 
 import (
 	"context"
+	"fmt"
+
 	"gitlab.com/sadagatasgarov/otel-rezerv-api/types"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -19,6 +21,11 @@ type MongoRoomStore struct {
 	coll   *mongo.Collection
 
 	HotelStore
+}
+
+func (s *MongoRoomStore) Drop(ctx context.Context) error {
+	fmt.Println("Dropping user collection bu isledi")
+	return s.coll.Drop(ctx)
 }
 
 func NewMongoRoomStore(client *mongo.Client, hotelstore HotelStore) *MongoRoomStore {

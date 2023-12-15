@@ -17,7 +17,7 @@ import (
 func TestAuthenticateSuccess(t *testing.T) {
 	tdb := setup(t)
 	defer tdb.teardown(t)
-	insertedUser := fixtures.AddUser(tdb.Store, "sada1", "asga1", false)
+	insertedUser := fixtures.AddUser(tdb.Store, "sada", "asga", false)
 
 	app := fiber.New()
 	authHandler := NewAuthHandler(tdb.User)
