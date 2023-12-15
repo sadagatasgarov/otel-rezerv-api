@@ -35,23 +35,25 @@ func TestAdminGetBookings(t *testing.T) {
 	authHandler := NewAuthHandler(tdb.User)
 	bookHandler := NewBookingHandler(tdb.Store)
 
-	app.Post("/bookpost", authHandler.HandleAuth)
-	app.Get("/booklist", bookHandler.HandleGetBookings)
+	app.Post("/auth", authHandler.HandleAuth)
 
-	// buradada rezeerv edirik otagi
-	req := httptest.NewRequest(http.MethodPost, "/bookpost", bytes.NewReader(b))
-	postresp, err := app.Test(req, 2000)
+	// Giris edirik
+	req := httptest.NewRequest(http.MethodPost, "/auth", bytes.NewReader(b))
+	authresp, err := app.Test(req, 2000)
 	if err != nil {
 		t.Fatal(err)
 	}
 	var data map[string]string
-	json.NewDecoder(postresp.Body).Decode(&data)
+	json.NewDecoder(authresp.Body).Decode(&data)
 	token := data["token"]
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("x-api-token", token)
 
+	app.Get("/booking", bookHandler.HandleGetBooking)
+
 	// rezerv edilmis otaqlari siralayiriq
-	req = httptest.NewRequest(http.MethodGet, "/booklist", nil)
+	app.Get("/booking", bookHandler.HandleGetBookings)
+	req = httptest.NewRequest(http.MethodGet, "/booking", nil)
 	getresp, err := app.Test(req, 2000)
 	if err != nil {
 		t.Fatal(err)
@@ -68,6 +70,7 @@ func TestAdminGetBookings(t *testing.T) {
 
 	var postbooking *types.Booking
 	if err := json.NewDecoder(postresp.Body).Decode(&postbooking); err != nil {
+		fmt.Println(postbooking)
 		t.Fatal(err)
 	}
 
