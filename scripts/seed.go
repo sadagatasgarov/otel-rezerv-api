@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"gitlab.com/sadagatasgarov/otel-rezerv-api/api"
@@ -50,8 +51,21 @@ func main() {
 	booking := fixtures.AddBooking(store, user.ID, room.ID, 2, time.Now(), time.Now().AddDate(0, 0, 5))
 	fmt.Println("booking ----> ", booking)
 
-	for i := 0; i < 100; i++ {
-		fixtures.AddHotel(store, "Tebriz"+string(i), "Nakhchivan"+string(i),i, nil)
+	for i := 0; i < 10; i++ {
+
+		fixtures.AddHotel(store, "Tebriz", "Nakhchivan", 5, nil)
+
+	}
+	for i := 0; i < 5; i++ {
+
+		fixtures.AddHotel(store, "Tebriz", "Nakhchivan", 3, nil)
+
+	}
+
+	for i := 0; i < 20; i++ {
+
+		fixtures.AddHotel(store, "Tebriz", strconv.Itoa(i), 2, nil)
+
 	}
 
 }

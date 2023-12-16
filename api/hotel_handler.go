@@ -1,6 +1,8 @@
 package api
 
 import (
+	"fmt"
+
 	db "gitlab.com/sadagatasgarov/otel-rezerv-api/storage"
 
 	"github.com/gofiber/fiber/v2"
@@ -35,32 +37,44 @@ func (h *HotelHandler) HandleGetRooms(c *fiber.Ctx) error {
 
 type ResourceResp struct {
 	Data    any `json:"data"`
-	Results int   `json:"results"`
-	Page    int   `json:"page"`
+	Results int `json:"results"`
+	Page    int `json:"page"`
 }
 
-// func NewResourceResp(data any, page int) ResourceResp {
-// 	return ResourceResp{
-// 		Results: len(data),
-// 		Data: data,
-// 		Page: page,
-// 	}
-// }
+type HotelQueryParams struct {
+	Rating int `json:"rating"`
+	db.Pagination
+}
 
 func (h *HotelHandler) HandleGetHotels(c *fiber.Ctx) error {
-	var pagination db.Pagination
-	if err := c.QueryParser(&pagination); err != nil {
+	//var pagination db.Pagination
+	var params HotelQueryParams
+	if err := c.QueryParser(&params); err != nil {
 		return ErrBadRequest()
 	}
-	hotels, err := h.store.Hotel.GetHotels(c.Context(), nil, &pagination)
+
+
+	filter := db.Map{
+		"rating": params.Rating,
+	}
+	//fmt.Println(params.Rating, params.Page, params.Limit)
+
+	if params.Page==0{
+		params.Limit=0
+	}
+
+	if params.Rating==0{
+		filter=nil
+	}
+	hotels, err := h.store.Hotel.GetHotels(c.Context(), filter, &params.Pagination)
 	if err != nil {
 		return ErrNotResourceNotFound("hotels")
 	}
 
-	resp:=ResourceResp{
-		Data: hotels,
+	resp := ResourceResp{
+		Data:    hotels,
 		Results: len(hotels),
-		Page: int(pagination.Page),
+		Page:    int(params.Page),
 	}
 	return c.JSON(resp)
 }
