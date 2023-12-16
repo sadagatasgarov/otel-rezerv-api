@@ -52,10 +52,8 @@ func (s *MongoHotelStore) Insert(ctx context.Context, hotel *types.Hotel) (*type
 
 func (s *MongoHotelStore) GetHotels(ctx context.Context, filter Map, pag *Pagination) ([]*types.Hotel, error) {
 	opts := options.FindOptions{}
-	page := 1
-	limit := 10
-	opts.SetSkip(int64((page - 1) * limit))
-	opts.SetLimit(int64(limit))
+	opts.SetSkip(int64((pag.Page - 1) * pag.Limit))
+	opts.SetLimit(pag.Limit)
 	var hotels []*types.Hotel
 	resp, err := s.coll.Find(ctx, filter, &opts)
 	if err != nil {

@@ -33,20 +33,36 @@ func (h *HotelHandler) HandleGetRooms(c *fiber.Ctx) error {
 	return c.JSON(rooms)
 }
 
+type ResourceResp struct {
+	Data    any `json:"data"`
+	Results int   `json:"results"`
+	Page    int   `json:"page"`
+}
+
+// func NewResourceResp(data any, page int) ResourceResp {
+// 	return ResourceResp{
+// 		Results: len(data),
+// 		Data: data,
+// 		Page: page,
+// 	}
+// }
+
 func (h *HotelHandler) HandleGetHotels(c *fiber.Ctx) error {
 	var pagination db.Pagination
-
 	if err := c.QueryParser(&pagination); err != nil {
 		return ErrBadRequest()
 	}
-
-	// fmt.Println(queryFilter)
-
 	hotels, err := h.store.Hotel.GetHotels(c.Context(), nil, &pagination)
 	if err != nil {
 		return ErrNotResourceNotFound("hotels")
 	}
-	return c.JSON(hotels)
+
+	resp:=ResourceResp{
+		Data: hotels,
+		Results: len(hotels),
+		Page: int(pagination.Page),
+	}
+	return c.JSON(resp)
 }
 
 func (h *HotelHandler) HandleGetHotel(c *fiber.Ctx) error {
