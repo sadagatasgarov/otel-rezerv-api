@@ -1,8 +1,6 @@
 package api
 
 import (
-	"fmt"
-
 	db "gitlab.com/sadagatasgarov/otel-rezerv-api/storage"
 
 	"github.com/gofiber/fiber/v2"
@@ -53,18 +51,17 @@ func (h *HotelHandler) HandleGetHotels(c *fiber.Ctx) error {
 		return ErrBadRequest()
 	}
 
-
 	filter := db.Map{
 		"rating": params.Rating,
 	}
 	//fmt.Println(params.Rating, params.Page, params.Limit)
 
-	if params.Page==0{
-		params.Limit=0
+	if params.Page == 0 {
+		params.Limit = 0
 	}
 
-	if params.Rating==0{
-		filter=nil
+	if params.Rating == 0 {
+		filter = nil
 	}
 	hotels, err := h.store.Hotel.GetHotels(c.Context(), filter, &params.Pagination)
 	if err != nil {
