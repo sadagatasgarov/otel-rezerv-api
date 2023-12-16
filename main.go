@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"log"
-	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/sadagatasgarov/otel-rezerv-api/api"
@@ -14,14 +13,7 @@ import (
 )
 
 var config = fiber.Config{
-	ErrorHandler: func(c *fiber.Ctx, err error) error {
-		if apiError, ok := err.(api.Error); ok {
-			return c.Status(apiError.Code).JSON(apiError)
-		}
-		apiError := api.NewError(http.StatusInternalServerError, err.Error())
-		return c.Status(apiError.Code).JSON(apiError)
-		//return c.JSON(map[string]string{"error": err.Error()})
-	},
+	ErrorHandler: api.ErrorHandler,
 }
 
 func main() {
@@ -54,7 +46,6 @@ func main() {
 		admin          = apiv1.Group("/admin", api.AdminAuth)
 	)
 
-	
 	// Versioned API routes
 	auth.Post("/auth", authHandler.HandleAuth)
 	auth.Post("/user", userHandler.HandleCreateUser)

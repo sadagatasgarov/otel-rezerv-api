@@ -16,6 +16,11 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+var config = fiber.Config{
+	ErrorHandler: ErrorHandler,
+}
+
+
 func TestUserGetBooking(t *testing.T) {
 	tdb := setup(t)
 	defer tdb.teardown(t)
@@ -27,7 +32,7 @@ func TestUserGetBooking(t *testing.T) {
 		room    = fixtures.AddRoom(tdb.Store, "test _size", true, 50, hotel.ID, true)
 		booking = fixtures.AddBooking(tdb.Store, user.ID, room.ID, 3, time.Now(), time.Now().AddDate(0, 0, 2))
 
-		app            = fiber.New()
+		app            = fiber.New(config)
 		route          = app.Group("/", JWTAuthentication(tdb.User))
 		bookingHandler = NewBookingHandler(tdb.Store)
 	)
@@ -80,13 +85,13 @@ func TestAdminGetBookings(t *testing.T) {
 	defer tdb.teardown(t)
 	var (
 		adminUser = fixtures.AddUser(tdb.Store, "admin", "admin", true)
-		user      = fixtures.AddUser(tdb.Store, "user", "admin", false)
+		user      = fixtures.AddUser(tdb.Store, "user", "user", false)
 
 		hotel   = fixtures.AddHotel(tdb.Store, "Test oteli", "Namelum yer", 5, nil)
 		room    = fixtures.AddRoom(tdb.Store, "test _size", true, 50, hotel.ID, true)
 		booking = fixtures.AddBooking(tdb.Store, user.ID, room.ID, 3, time.Now(), time.Now().AddDate(0, 0, 2))
 
-		app            = fiber.New()
+		app            = fiber.New(config)
 		admin          = app.Group("/", JWTAuthentication(tdb.User), AdminAuth)
 		bookingHandler = NewBookingHandler(tdb.Store)
 	)
@@ -130,7 +135,8 @@ func TestAdminGetBookings(t *testing.T) {
 	}
 
 	// test admin olmayan istifadeci
-	req = httptest.NewRequest(http.MethodGet, "/bookings", nil)
+	admin.Get("/booking", bookingHandler.HandleGetBookings)
+	req = httptest.NewRequest(http.MethodGet, "/booking", nil)
 	req.Header.Add("X-Api-Token", CreateTokenFromUser(user))
 	req.Header.Add("Content-type", "application/json")
 	resp, err := app.Test(req, 3000)
@@ -138,8 +144,10 @@ func TestAdminGetBookings(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if resp.StatusCode == http.StatusOK {
-		t.Fatalf("200 cavabi olmamalidir amma cavab %d-dur", resp.StatusCode)
+	if resp.StatusCode != http.StatusUnauthorized {
+		fmt.Println(resp.StatusCode)
+		fmt.Println(http.StatusUnauthorized)
+		t.Fatalf("expected status inauthorized but got %d", resp.StatusCode)
 	}
 
 }

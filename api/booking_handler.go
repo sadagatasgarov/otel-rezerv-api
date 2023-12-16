@@ -1,8 +1,6 @@
 package api
 
 import (
-	"net/http"
-
 	db "gitlab.com/sadagatasgarov/otel-rezerv-api/storage"
 
 	"github.com/gofiber/fiber/v2"
@@ -28,15 +26,11 @@ func (h *BookingHandler) HandleCancelBooking(c *fiber.Ctx) error {
 	}
 	user, err := getAuthUser(c)
 	if err != nil {
-		return err
+		return ErrUnAuthorized()
 	}
 
 	if booking.UserID != user.ID {
-		return c.Status(http.StatusUnauthorized).JSON(
-			genericResp{
-				Type: "info",
-				Msg:  "not authorized",
-			})
+		return ErrUnAuthorized()
 	}
 
 	if err := h.store.Booking.UpdateBooking(c.Context(), booking.ID.Hex(), bson.M{"cancelled": true}); err != nil {
@@ -54,6 +48,7 @@ func (h *BookingHandler) HandleGetBookings(c *fiber.Ctx) error {
 	if err != nil {
 		return ErrNotResourceNotFound("bookings")
 	}
+	
 	return c.JSON(bookings)
 }
 
@@ -66,15 +61,11 @@ func (h *BookingHandler) HandleGetBooking(c *fiber.Ctx) error {
 
 	user, err := getAuthUser(c)
 	if err != nil {
-		return err
+		return ErrUnAuthorized()
 	}
 
 	if booking.UserID != user.ID {
-		return c.Status(http.StatusUnauthorized).JSON(
-			genericResp{
-				Type: "info",
-				Msg:  "Bilinmeyen booking id",
-			})
+		return ErrUnAuthorized()
 
 	}
 	return c.JSON(booking)

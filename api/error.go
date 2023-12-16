@@ -1,6 +1,19 @@
 package api
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+func ErrorHandler(c *fiber.Ctx, err error) error {
+	if apiError, ok := err.(Error); ok {
+		return c.Status(apiError.Code).JSON(apiError)
+	}
+	apiError := NewError(http.StatusInternalServerError, err.Error())
+	return c.Status(apiError.Code).JSON(apiError)
+	//return c.JSON(map[string]string{"error": err.Error()})
+}
 
 type Error struct {
 	Code int    `json:"code"`
@@ -11,7 +24,6 @@ type Error struct {
 func (e Error) Error() string {
 	return e.Err
 }
-
 
 func NewError(code int, msg string) Error {
 	return Error{
@@ -40,7 +52,6 @@ func ErrBadRequest() Error {
 		Err:  "Invalid JSON request",
 	}
 }
-
 
 func ErrNotResourceNotFound(res string) Error {
 	return Error{

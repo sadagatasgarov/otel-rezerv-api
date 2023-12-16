@@ -40,7 +40,7 @@ func JWTAuthentication(userStore db.UserStore) fiber.Handler {
 		if err != nil {
 			return ErrUnAuthorized()
 		}
-		
+
 		c.Context().SetUserValue("user", user)
 
 		return c.Next()
@@ -69,6 +69,7 @@ func parseJWTToken(tokenStr string) (jwt.MapClaims, error) {
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
+		
 		return nil, ErrUnAuthorized()
 	}
 
