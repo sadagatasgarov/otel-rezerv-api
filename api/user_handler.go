@@ -8,7 +8,6 @@ import (
 	"gitlab.com/sadagatasgarov/otel-rezerv-api/types"
 
 	"github.com/gofiber/fiber/v2"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -25,21 +24,15 @@ func NewUserHandler(userStore db.UserStore) *UserHandler {
 func (h UserHandler) HandleUpdateUser(c *fiber.Ctx) error {
 
 	var (
-		//values bson.M
-		params types.UpdateUserParams
 		userID = c.Params("id")
+		params types.UpdateUserParams
 	)
-	oid, err := primitive.ObjectIDFromHex(userID)
-	if err != nil {
-		return ErrInvalidID()
-	}
 
 	if err := c.BodyParser(&params); err != nil {
 		return ErrBadRequest()
 	}
-	filter := db.Map{"_id": oid}
 
-	if err := h.userStore.UpdateUser(c.Context(), filter, params); err != nil {
+	if err := h.userStore.UpdateUser(c.Context(), userID, params); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return c.JSON(map[string]string{"msg": "Duzeltmek istediyiniz istifadeci tapilmadi"})
 		}

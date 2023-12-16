@@ -4,9 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
+
 	db "gitlab.com/sadagatasgarov/otel-rezerv-api/storage"
 	"gitlab.com/sadagatasgarov/otel-rezerv-api/types"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -75,8 +76,8 @@ func CreateTokenFromUser(user *types.Users) string {
 	now := time.Now()
 	expires := now.Add(time.Hour * 4).Unix()
 	claims := jwt.MapClaims{
-		"id":        user.ID,
-		"email":     user.Email,
+		"id":      user.ID,
+		"email":   user.Email,
 		"expires": expires,
 	}
 

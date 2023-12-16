@@ -7,7 +7,6 @@ import (
 
 	"gitlab.com/sadagatasgarov/otel-rezerv-api/types"
 
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -24,7 +23,7 @@ type UserStore interface {
 	GetUsers(context.Context) ([]*types.Users, error)
 	InsertUser(context.Context, *types.Users) (*types.Users, error)
 	DeleteUser(context.Context, string) (*types.Users, error)
-	UpdateUser(context.Context, Map, types.UpdateUserParams) error
+	UpdateUser(context.Context, string, types.UpdateUserParams) error
 	GetUserByEmail(context.Context, string) (*types.Users, error)
 }
 
@@ -46,14 +45,16 @@ func (s *MongoUserStore) Drop(ctx context.Context) error {
 	return s.coll.Drop(ctx)
 }
 
-func (s *MongoUserStore) UpdateUser(ctx context.Context, filter Map, params types.UpdateUserParams) error {
-	update := bson.M{"$set": params.ToBSON()}
-	// update := bson.D{
-	// 	{
-	// 		Key: "$set", Value: params.ToBSON(),
-	// 	},
-	// }
-	_, err := s.coll.UpdateOne(ctx, filter, update)
+func (s *MongoUserStore) UpdateUser(ctx context.Context, id string, params types.UpdateUserParams) error {
+
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	filter := Map{"_id": oid}
+	update := Map{"$set": params.ToBSON()}
+
+	_, err = s.coll.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return err
 	}
@@ -67,11 +68,11 @@ func (s *MongoUserStore) DeleteUser(ctx context.Context, id string) (*types.User
 	}
 
 	var user types.Users
-	if err := s.coll.FindOne(ctx, bson.D{{Key: "_id", Value: oid}}).Decode(&user); err != nil {
+	if err := s.coll.FindOne(ctx, Map{"_id": oid}).Decode(&user); err != nil {
 		return nil, err
 	}
 
-	_, err = s.coll.DeleteOne(ctx, bson.M{"_id": user.ID})
+	_, err = s.coll.DeleteOne(ctx, Map{"_id": user.ID})
 
 	return &user, err
 }
@@ -79,7 +80,7 @@ func (s *MongoUserStore) DeleteUser(ctx context.Context, id string) (*types.User
 func (s *MongoUserStore) InsertUser(ctx context.Context, u *types.Users) (*types.Users, error) {
 
 	var user *types.Users
-	if err := s.coll.FindOne(ctx, bson.D{{Key: "email", Value: u.Email}}).Decode(&user); err != nil {
+	if err := s.coll.FindOne(ctx, Map{"email": u.Email}).Decode(&user); err != nil {
 		res, err := s.coll.InsertOne(ctx, u)
 		if err != nil {
 			return nil, err
@@ -103,7 +104,7 @@ func (s *MongoUserStore) InsertUser(ctx context.Context, u *types.Users) (*types
 
 func (s *MongoUserStore) GetUsers(ctx context.Context) ([]*types.Users, error) {
 	var users []*types.Users
-	cur, err := s.coll.Find(ctx, bson.M{})
+	cur, err := s.coll.Find(ctx, Map{})
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +121,7 @@ func (s *MongoUserStore) GetUserById(ctx context.Context, id string) (*types.Use
 	}
 
 	var user types.Users
-	if err := s.coll.FindOne(ctx, bson.M{"_id": oid}).Decode(&user); err != nil {
+	if err := s.coll.FindOne(ctx, Map{"_id": oid}).Decode(&user); err != nil {
 		return nil, err
 	}
 	return &user, nil
@@ -128,7 +129,7 @@ func (s *MongoUserStore) GetUserById(ctx context.Context, id string) (*types.Use
 
 func (s *MongoUserStore) GetUserByEmail(ctx context.Context, email string) (*types.Users, error) {
 	var user types.Users
-	if err := s.coll.FindOne(ctx, bson.M{"email": email}).Decode(&user); err != nil {
+	if err := s.coll.FindOne(ctx, Map{"email": email}).Decode(&user); err != nil {
 		return nil, err
 	}
 	return &user, nil
