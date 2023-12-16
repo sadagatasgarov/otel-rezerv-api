@@ -50,4 +50,8 @@ func main() {
 	booking := fixtures.AddBooking(store, user.ID, room.ID, 2, time.Now(), time.Now().AddDate(0, 0, 5))
 	fmt.Println("booking ----> ", booking)
 
+	for i := 0; i < 100; i++ {
+		fixtures.AddHotel(store, "Tebriz"+string(i), "Nakhchivan"+string(i),i, nil)
+	}
+
 }
