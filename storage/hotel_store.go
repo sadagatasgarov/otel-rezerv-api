@@ -13,8 +13,8 @@ import (
 
 type HotelStore interface {
 	Insert(context.Context, *types.Hotel) (*types.Hotel, error)
-	Update(ctx context.Context, filter bson.M, update bson.M) error
-	GetHotels(ctx context.Context, filter bson.M) ([]*types.Hotel, error)
+	Update(context.Context, Map, Map) error
+	GetHotels(context.Context, Map) ([]*types.Hotel, error)
 	GetHotel(ctx context.Context, oid primitive.ObjectID) (*types.Hotel, error)
 }
 
@@ -34,7 +34,7 @@ func (s *MongoHotelStore) Drop(ctx context.Context) error {
 	fmt.Println("Dropping user collection bu isledi")
 	return s.coll.Drop(ctx)
 }
-func (s *MongoHotelStore) Update(ctx context.Context, filter bson.M, update bson.M) error {
+func (s *MongoHotelStore) Update(ctx context.Context, filter Map, update Map) error {
 	_, err := s.coll.UpdateOne(ctx, filter, update)
 	return err
 }
@@ -49,7 +49,7 @@ func (s *MongoHotelStore) Insert(ctx context.Context, hotel *types.Hotel) (*type
 	return hotel, nil
 }
 
-func (s *MongoHotelStore) GetHotels(ctx context.Context, filter bson.M) ([]*types.Hotel, error) {
+func (s *MongoHotelStore) GetHotels(ctx context.Context, filter Map) ([]*types.Hotel, error) {
 	var hotels []*types.Hotel
 	resp, err := s.coll.Find(ctx, filter)
 	if err != nil {

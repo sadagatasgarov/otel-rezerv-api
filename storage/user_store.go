@@ -12,6 +12,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+type Map map[string]any
+
 type Dropper interface {
 	Drop(ctx context.Context) error
 }
@@ -22,8 +24,8 @@ type UserStore interface {
 	GetUsers(context.Context) ([]*types.Users, error)
 	InsertUser(context.Context, *types.Users) (*types.Users, error)
 	DeleteUser(context.Context, string) (*types.Users, error)
-	UpdateUser(ctx context.Context, filter bson.M, params types.UpdateUserParams) error
-	GetUserByEmail(ctx context.Context, email string) (*types.Users, error)
+	UpdateUser(context.Context, Map, types.UpdateUserParams) error
+	GetUserByEmail(context.Context, string) (*types.Users, error)
 }
 
 type MongoUserStore struct {
@@ -44,7 +46,7 @@ func (s *MongoUserStore) Drop(ctx context.Context) error {
 	return s.coll.Drop(ctx)
 }
 
-func (s *MongoUserStore) UpdateUser(ctx context.Context, filter bson.M, params types.UpdateUserParams) error {
+func (s *MongoUserStore) UpdateUser(ctx context.Context, filter Map, params types.UpdateUserParams) error {
 	update := bson.M{"$set": params.ToBSON()}
 	// update := bson.D{
 	// 	{
