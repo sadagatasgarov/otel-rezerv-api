@@ -32,11 +32,11 @@ func (h UserHandler) HandleUpdateUser(c *fiber.Ctx) error {
 	)
 	oid, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
-		return err
+		return ErrInvalidID()
 	}
 
 	if err := c.BodyParser(&params); err != nil {
-		return err
+		return ErrBadRequest()
 	}
 	filter := bson.M{"_id": oid}
 
@@ -68,7 +68,7 @@ func (h UserHandler) HandleCreateUser(c *fiber.Ctx) error {
 	var params types.CreateUserParams
 
 	if err := c.BodyParser(&params); err != nil {
-		return err
+		return ErrBadRequest()
 	}
 
 	if err := params.Validate(); err != nil {
@@ -82,7 +82,7 @@ func (h UserHandler) HandleCreateUser(c *fiber.Ctx) error {
 
 	insertedUser, err := h.userStore.InsertUser(c.Context(), user)
 	if err != nil {
-		return err
+		return ErrNotResourceNotFound("user")
 	}
 
 	return c.JSON(insertedUser)

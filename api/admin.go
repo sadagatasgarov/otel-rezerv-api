@@ -1,10 +1,10 @@
-package middleware
+package api
 
 import (
 	"fmt"
-	"gitlab.com/sadagatasgarov/otel-rezerv-api/types"
 
 	"github.com/gofiber/fiber/v2"
+	"gitlab.com/sadagatasgarov/otel-rezerv-api/types"
 )
 
 func AdminAuth(c *fiber.Ctx) error {

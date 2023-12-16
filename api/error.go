@@ -20,7 +20,7 @@ func NewError(code int, msg string) Error {
 	}
 }
 
-func ErrInvalid() Error {
+func ErrInvalidID() Error {
 	return Error{
 		Code: http.StatusBadRequest,
 		Err:  "invalid id given",
@@ -31,5 +31,20 @@ func ErrUnAuthorized() Error {
 	return Error{
 		Code: http.StatusUnauthorized,
 		Err:  "unauthorized request",
+	}
+}
+
+func ErrBadRequest() Error {
+	return Error{
+		Code: http.StatusBadRequest,
+		Err:  "Invalid JSON request",
+	}
+}
+
+
+func ErrNotResourceNotFound(res string) Error {
+	return Error{
+		Code: http.StatusNotFound,
+		Err:  res + " resource not found",
 	}
 }

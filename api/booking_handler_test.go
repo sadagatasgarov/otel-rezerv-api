@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"gitlab.com/sadagatasgarov/otel-rezerv-api/middleware"
 	"gitlab.com/sadagatasgarov/otel-rezerv-api/storage/fixtures"
 	"gitlab.com/sadagatasgarov/otel-rezerv-api/types"
 	"go.mongodb.org/mongo-driver/bson"
@@ -22,14 +21,14 @@ func TestUserGetBooking(t *testing.T) {
 	defer tdb.teardown(t)
 
 	var (
-		user = fixtures.AddUser(tdb.Store, "user", "admin", false)
-		user2 = fixtures.AddUser(tdb.Store, "user2", "admin", false)
+		user    = fixtures.AddUser(tdb.Store, "user", "admin", false)
+		user2   = fixtures.AddUser(tdb.Store, "user2", "admin", false)
 		hotel   = fixtures.AddHotel(tdb.Store, "Test oteli", "Namelum yer", 5, nil)
 		room    = fixtures.AddRoom(tdb.Store, "test _size", true, 50, hotel.ID, true)
 		booking = fixtures.AddBooking(tdb.Store, user.ID, room.ID, 3, time.Now(), time.Now().AddDate(0, 0, 2))
 
 		app            = fiber.New()
-		route          = app.Group("/", middleware.JWTAuthentication(tdb.User))
+		route          = app.Group("/", JWTAuthentication(tdb.User))
 		bookingHandler = NewBookingHandler(tdb.Store)
 	)
 
@@ -51,18 +50,16 @@ func TestUserGetBooking(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	
 	var getbooking *types.Booking
 	if err := json.NewDecoder(resp.Body).Decode(&getbooking); err != nil {
 		t.Fatal(err)
 	}
 
-	if !reflect.DeepEqual(bookingd, getbooking){
+	if !reflect.DeepEqual(bookingd, getbooking) {
 		fmt.Println(bookingd)
 		fmt.Println(getbooking)
 		t.Fatal("expected bookinng to be equal")
 	}
-
 
 	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/%s", booking.ID.Hex()), nil)
 	req.Header.Add("X-Api-Token", CreateTokenFromUser(user2))
@@ -75,7 +72,6 @@ func TestUserGetBooking(t *testing.T) {
 	if resp.StatusCode == http.StatusOK {
 		t.Fatalf("200 cavabi olmamalidir amma cavab %d-dur", resp.StatusCode)
 	}
-
 
 }
 
@@ -91,7 +87,7 @@ func TestAdminGetBookings(t *testing.T) {
 		booking = fixtures.AddBooking(tdb.Store, user.ID, room.ID, 3, time.Now(), time.Now().AddDate(0, 0, 2))
 
 		app            = fiber.New()
-		admin          = app.Group("/", middleware.JWTAuthentication(tdb.User), middleware.AdminAuth)
+		admin          = app.Group("/", JWTAuthentication(tdb.User), AdminAuth)
 		bookingHandler = NewBookingHandler(tdb.Store)
 	)
 

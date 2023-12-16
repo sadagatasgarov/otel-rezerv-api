@@ -4,23 +4,23 @@ import (
 	"context"
 	"flag"
 	"log"
-
-	"gitlab.com/sadagatasgarov/otel-rezerv-api/api"
-	"gitlab.com/sadagatasgarov/otel-rezerv-api/middleware"
-	db "gitlab.com/sadagatasgarov/otel-rezerv-api/storage"
+	"net/http"
 
 	"github.com/gofiber/fiber/v2"
-
+	"gitlab.com/sadagatasgarov/otel-rezerv-api/api"
+	db "gitlab.com/sadagatasgarov/otel-rezerv-api/storage"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var config = fiber.Config{
 	ErrorHandler: func(c *fiber.Ctx, err error) error {
-		if apiError, ok:=err.(api.Error);ok{
+		if apiError, ok := err.(api.Error); ok {
 			return c.Status(apiError.Code).JSON(apiError)
 		}
-		return c.JSON(map[string]string{"error": err.Error()})
+		apiError := api.NewError(http.StatusInternalServerError, err.Error())
+		return c.Status(apiError.Code).JSON(apiError)
+		//return c.JSON(map[string]string{"error": err.Error()})
 	},
 }
 
@@ -50,10 +50,11 @@ func main() {
 		bookingHandler = api.NewBookingHandler(&store)
 		app            = fiber.New(config)
 		auth           = app.Group("/api")
-		apiv1          = app.Group("/api/v1", middleware.JWTAuthentication(userStore))
-		admin          = apiv1.Group("/admin", middleware.AdminAuth)
+		apiv1          = app.Group("/api/v1", api.JWTAuthentication(userStore))
+		admin          = apiv1.Group("/admin", api.AdminAuth)
 	)
 
+	
 	// Versioned API routes
 	auth.Post("/auth", authHandler.HandleAuth)
 	auth.Post("/user", userHandler.HandleCreateUser)
@@ -90,4 +91,4 @@ func main() {
 // 	return c.JSON(map[string]string{"msg": "working"})
 // }
 
-//35in   10:16
+//37  08:28
