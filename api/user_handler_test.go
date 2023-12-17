@@ -30,9 +30,9 @@ func TestPostUser(t *testing.T) {
 	app.Post("/", userHandler.HandleCreateUser)
 
 	params := types.CreateUserParams{
-		FirstName: "user2",
-		LastName:  "user2",
-		Email:     "user2@user.com",
+		FirstName: "usertest",
+		LastName:  "usertest",
+		Email:     "usertest@user.com",
 		Password:  "useruser",
 		IsAdmin:   false,
 	}

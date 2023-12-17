@@ -25,8 +25,9 @@ func main() {
 			log.Fatal(err)
 		}
 	} else {
-		serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-		client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI).SetServerAPIOptions(serverAPI))
+		//serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+		client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
+		//.SetServerAPIOptions(serverAPI))
 		if err != nil {
 			log.Fatal(err)
 		}

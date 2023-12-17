@@ -10,7 +10,7 @@ seed:
 docker:
 	@docker build -t sadagatasgarov/hotel-rezerv .
 	@docker push sadagatasgarov/hotel-rezerv
-	@docker compose up
+	@docker compose up -d
 
 test:
 	@go test -v ./... -count=1

@@ -17,19 +17,42 @@ type testdb struct {
 
 func (tdb *testdb) teardown(t *testing.T) {
 
-	if err := tdb.client.Database(db.DBNAME).Drop(context.TODO()); err != nil {
-		t.Fatal(err)
+	if db.DBNAME == "" {
+		if err := tdb.client.Database(db.DBNAMELOKAL).Drop(context.TODO()); err != nil {
+			t.Fatal(err)
+		}
+	} else {
+		if err := tdb.client.Database(db.DBNAME).Drop(context.TODO()); err != nil {
+			t.Fatal(err)
+		}
 	}
 
 }
 
 func setup(t *testing.T) *testdb {
 	//serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
+	//client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
 	//.SetServerAPIOptions(serverAPI))
-	if err != nil {
-		log.Fatal(err)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+
+	var client *mongo.Client
+	var err error
+	if db.DBURI == "" {
+		client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURILOKAL))
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		//serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+		client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
+		//.SetServerAPIOptions(serverAPI))
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
+
 	hotelStore := db.NewMongoHotelStore(client)
 
 	return &testdb{
