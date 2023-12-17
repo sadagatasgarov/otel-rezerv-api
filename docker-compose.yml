@@ -29,7 +29,18 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
 
+  hotel-rezerv:
+    image: sadagatasgarov/hotel-rezerv
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      DB_NAME: hotel-rezervation
+      HTTP_LISTENING_PORT: :5000
+      JWT_SECRET: bunuAYRIbirYERDEsaxlamaqLAZIMDIR
+      MONGODB_URL: mongodb://root:example@mongo:27017/
+      MONGODB_URL!: mongodb+srv://user:example@cluster0.nlvrqpz.mongodb.net/?retryWrites=true&w=majority
+
 volumes:
   local_mongo_data:
-
 

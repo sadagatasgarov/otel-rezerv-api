@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"flag"
 	"log"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/sadagatasgarov/otel-rezerv-api/api"
@@ -17,11 +17,25 @@ var config = fiber.Config{
 }
 
 func main() {
-	listenAddr := flag.String("listenAddr", ":5000", "The listen addres of the API server")
-	flag.Parse()
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
-	if err != nil {
-		log.Fatal(err)
+
+	//listenAddr := flag.String("listenAddr", ":5000", "The listen addres of the API server")
+
+	//flag.Parse()
+	var client *mongo.Client
+	var err error
+	//client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
+	
+	if db.DBURI == ""{
+		client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURILOKAL))
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+		client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI).SetServerAPIOptions(serverAPI))
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	var (
@@ -73,7 +87,14 @@ func main() {
 	// admin handlers
 	admin.Get("/booking", bookingHandler.HandleGetBookings)
 
-	app.Listen(*listenAddr)
+	listenAddr := os.Getenv("HTTP_LISTENING_PORT")
+	if listenAddr == "" {
+		listenAddr := ":6000"	
+		app.Listen(listenAddr)
+	}else{
+		app.Listen(listenAddr)
+	}
+	
 
 }
 

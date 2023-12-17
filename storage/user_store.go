@@ -34,9 +34,16 @@ type MongoUserStore struct {
 
 func NewMongoUserStore(c *mongo.Client) *MongoUserStore {
 
-	return &MongoUserStore{
-		client: c,
-		coll:   c.Database(DBNAME).Collection(USERCOLL),
+	if DBNAME == "" {
+		return &MongoUserStore{
+			client: c,
+			coll:   c.Database(DBNAMELOKAL).Collection(USERCOLL),
+		}
+	} else {
+		return &MongoUserStore{
+			client: c,
+			coll:   c.Database(DBNAME).Collection(USERCOLL),
+		}
 	}
 }
 

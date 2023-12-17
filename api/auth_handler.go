@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	db "gitlab.com/sadagatasgarov/otel-rezerv-api/storage"
@@ -82,7 +83,8 @@ func CreateTokenFromUser(user *types.Users) string {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	secret := []byte("salam")
+	sec := os.Getenv("JWT_SECRET")
+	secret := []byte(sec)
 
 	tokenStr, err := token.SignedString(secret)
 	if err != nil {

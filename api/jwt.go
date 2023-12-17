@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	db "gitlab.com/sadagatasgarov/otel-rezerv-api/storage"
@@ -53,8 +54,8 @@ func parseJWTToken(tokenStr string) (jwt.MapClaims, error) {
 			fmt.Println("invalid signing method: ", token.Header["alg"])
 			return nil, ErrUnAuthorized()
 		}
-		//secret:=os.Getenv("JWT_SECRET")
-		secret := "salam"
+		secret := os.Getenv("JWT_SECRET")
+		//secret := "salam"
 		return []byte(secret), nil
 	})
 
@@ -69,7 +70,7 @@ func parseJWTToken(tokenStr string) (jwt.MapClaims, error) {
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		
+
 		return nil, ErrUnAuthorized()
 	}
 

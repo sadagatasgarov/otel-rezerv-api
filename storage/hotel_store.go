@@ -25,9 +25,16 @@ type MongoHotelStore struct {
 }
 
 func NewMongoHotelStore(client *mongo.Client) *MongoHotelStore {
-	return &MongoHotelStore{
-		client: client,
-		coll:   client.Database(DBNAME).Collection(HOTELCOLL),
+	if DBNAME == "" {
+		return &MongoHotelStore{
+			client: client,
+			coll:   client.Database(DBNAMELOKAL).Collection(HOTELCOLL),
+		}
+	} else {
+		return &MongoHotelStore{
+			client: client,
+			coll:   client.Database(DBNAME).Collection(HOTELCOLL),
+		}
 	}
 }
 

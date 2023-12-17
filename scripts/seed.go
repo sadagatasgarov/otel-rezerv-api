@@ -17,14 +17,29 @@ import (
 
 func main() {
 	ctx := context.Background()
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
-
-	if err != nil {
-		log.Fatal(err)
+	var client *mongo.Client
+	var err error
+	if db.DBURI == "" {
+		client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURILOKAL))
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+		client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI).SetServerAPIOptions(serverAPI))
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
-	if err := client.Database(db.DBNAME).Drop(ctx); err != nil {
-		log.Fatal(err)
+	if db.DBNAME == "" {
+		if err := client.Database(db.DBNAMELOKAL).Drop(ctx); err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		if err := client.Database(db.DBNAME).Drop(ctx); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	hotelStore := db.NewMongoHotelStore(client)

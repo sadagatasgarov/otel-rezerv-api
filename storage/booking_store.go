@@ -25,10 +25,18 @@ type MongoBookingStore struct {
 }
 
 func NewMongoBookStore(client *mongo.Client) *MongoBookingStore {
-	return &MongoBookingStore{
-		client: client,
-		coll:   client.Database(DBNAME).Collection(BOOKCOLL),
+	if DBNAME == "" {
+		return &MongoBookingStore{
+			client: client,
+			coll:   client.Database(DBNAMELOKAL).Collection(BOOKCOLL),
+		}
+	} else {
+		return &MongoBookingStore{
+			client: client,
+			coll:   client.Database(DBNAME).Collection(BOOKCOLL),
+		}
 	}
+
 }
 
 func (s *MongoBookingStore) Drop(ctx context.Context) error {

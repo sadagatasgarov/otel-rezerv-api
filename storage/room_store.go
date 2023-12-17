@@ -29,10 +29,19 @@ func (s *MongoRoomStore) Drop(ctx context.Context) error {
 }
 
 func NewMongoRoomStore(client *mongo.Client, hotelstore HotelStore) *MongoRoomStore {
-	return &MongoRoomStore{
-		client:     client,
-		coll:       client.Database(DBNAME).Collection(ROOMCOLL),
-		HotelStore: hotelstore,
+
+	if DBNAME == "" {
+		return &MongoRoomStore{
+			client:     client,
+			coll:       client.Database(DBNAMELOKAL).Collection(ROOMCOLL),
+			HotelStore: hotelstore,
+		}
+	} else {
+		return &MongoRoomStore{
+			client:     client,
+			coll:       client.Database(DBNAME).Collection(ROOMCOLL),
+			HotelStore: hotelstore,
+		}
 	}
 }
 
