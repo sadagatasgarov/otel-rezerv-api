@@ -39,7 +39,6 @@ services:
       HTTP_LISTENING_PORT: :5000
       JWT_SECRET: bunuAYRIbirYERDEsaxlamaqLAZIMDIR
       MONGODB_URL: mongodb://root:example@mongo:27017/
-      MONGODB_URL!: mongodb+srv://user:example@cluster0.nlvrqpz.mongodb.net/?retryWrites=true&w=majority
 
 volumes:
   local_mongo_data:

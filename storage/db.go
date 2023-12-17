@@ -4,7 +4,7 @@ import "os"
 
 var DBURI string = os.Getenv("MONGODB_URL")
 var DBNAME string = os.Getenv("DB_NAME")
-var DBURIATLAS string = os.Getenv("MONGODB_URL_TEST")
+//var DBURIATLAS string = os.Getenv("MONGODB_URL_TEST")
 
 const (
 	DBURILOKAL = "mongodb://root:example@localhost:27017/"
