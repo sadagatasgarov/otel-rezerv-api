@@ -8,8 +8,8 @@ seed:
 	@go run scripts/seed.go
 
 docker:
-	@docker build -t sadagatasgarov/hotel-rezerv .
-	@docker push sadagatasgarov/hotel-rezerv
+	@docker build -t sadagatasgarov/hotel-rezerv:latest .
+	@docker push sadagatasgarov/hotel-rezerv:latest
 	@docker compose up -d
 
 test:
