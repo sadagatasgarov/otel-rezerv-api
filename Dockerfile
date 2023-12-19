@@ -4,7 +4,7 @@ COPY . .
 
 
 # Eger islemese "go mod vendor" ile lokalda vendoru yaradib birbasa gonderin built almaq daha mentiklidir
-RUN go mod download
+#RUN go mod download
 
 
 RUN go build -o ./app

@@ -14,3 +14,9 @@ docker:
 
 test:
 	@go test -v ./... -count=1
+
+
+git:
+	@git add .
+	@git commit -m"Duzelis"
+	@git push -u origin hazir
